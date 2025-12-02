@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>📱 Inventario COBATAB - Escáner Local</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="/Plantel-09/manifest.json">
+    <meta name="theme-color" content="#8B0000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <style>
+        :root {
+            --color-vino: #8B0000;
+            --color-vino-claro: #a83232;
+            --color-blanco: #FFFFFF;
+            --color-gris: #6c757d;
+            --color-gris-claro: #f8f9fa;
+            --color-verde: #28a745;
+            --color-azul: #007bff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--color-vino);
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            background: white;
+            min-height: 100vh;
+            border-radius: 30px 30px 0 0;
+            padding: 20px;
+            padding-top: 60px;
+            margin-top: 20px;
+            position: relative;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+        }
+        
+        /* Header Fijo */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: var(--color-vino);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-vino);
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .app-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .app-subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        /* Pestañas de Navegación */
+        .tabs-container {
+            display: flex;
+            background: var(--color-gris-claro);
+            border-radius: 15px;
+            padding: 5px;
+            margin: 20px 0;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            background: transparent;
+            color: var(--color-gris);
+        }
+        
+        .tab.active {
+            background: white;
+            color: var(--color-vino);
+            box-shadow: 0 2px 8px rgba(139,0,0,0.1);
+        }
+        
+        /* Área del Escáner */
+        .scanner-section {
+            display: block;
+        }
+        
+        .scanner-frame {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        #scanner-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .scanner-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 3px solid var(--color-vino);
+            border-radius: 15px;
+            background: transparent;
+        }
+        
+        .scanner-line {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: var(--color-vino);
+            top: 50%;
+            animation: scan 2s ease-in-out infinite;
+        }
+        
+        @keyframes scan {
+            0% { top: 10%; }
+            50% { top: 90%; }
+            100% { top: 10%; }
+        }
+        
+        /* Controles del Escáner */
+        .scanner-controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--color-vino);
+            color: white;
+        }
+        
+        .btn-primary:active {
+            background: var(--color-vino-claro);
+            transform: scale(0.98);
+        }
+        
+        .btn-secondary {
+            background: var(--color-gris-claro);
+            color: var(--color-gris);
+        }
+        
+        .btn-success {
+            background: var(--color-verde);
+            color: white;
+        }
+        
+        .btn-info {
+            background: var(--color-azul);
+            color: white;
+        }
+        
+        /* Resultados */
+        .results-section {
+            display: none;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid var(--color-vino);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .product-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-vino);
+            margin-bottom: 5px;
+        }
+        
+        .product-code {
+            font-size: 14px;
+            color: var(--color-gris);
+            background: var(--color-gris-claro);
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-available { background: #d4edda; color: #155724; }
+        .status-inuse { background: #fff3cd; color: #856404; }
+        .status-maintenance { background: #d1ecf1; color: #0c5460; }
+        .status-low { background: #f8d7da; color: #721c24; }
+        
+        .product-details {
+            margin: 15px 0;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--color-gris-claro);
+        }
+        
+        .detail-label {
+            color: var(--color-gris);
+            font-size: 14px;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            text-align: right;
+        }
+        
+        .value-highlight {
+            color: var(--color-vino);
+            font-size: 18px;
+        }
+        
+        /* Acciones del Producto */
+        .product-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* Historial */
+        .history-section {
+            display: none;
+        }
+        
+        .history-list {
+            margin-top: 20px;
+        }
+        
+        .history-item {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--color-vino);
+        }
+        
+        .history-info {
+            flex: 1;
+        }
+        
+        .history-time {
+            font-size: 12px;
+            color: var(--color-gris);
+            margin-bottom: 5px;
+        }
+        
+        .history-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .history-code {
+            font-size: 12px;
+            color: var(--color-gris);
+        }
+        
+        .history-action {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--color-gris-claro);
+            border: none;
+            color: var(--color-vino);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* Configuración */
+        .settings-section {
+            display: none;
+        }
+        
+        .settings-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--color-gris-claro);
+        }
+        
+        .setting-label {
+            font-weight: 600;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--color-vino);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        /* Estados de carga y error */
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--color-gris-claro);
+            border-top: 4px solid var(--color-vino);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        /* Modales */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-vino);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--color-gris);
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 360px) {
+            .app-container {
+                padding: 15px;
+                padding-top: 60px;
+            }
+            
+            .scanner-frame {
+                height: 250px;
+            }
+            
+            .scanner-overlay {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .btn {
+                padding: 14px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Fijo -->
+    <div class="app-header">
+        <div class="logo-container">
+            <div class="logo-icon">C09</div>
+            <div>
+                <div class="app-title">INVENTARIO COBATAB</div>
+                <div class="app-subtitle">Escáner Local</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" id="syncBtn" title="Sincronizar datos">
+                <i>🔄</i>
+            </button>
+            <button class="icon-btn" id="infoBtn" title="Información">
+                <i>ℹ️</i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Contenedor Principal -->
+    <div class="app-container">
+        <!-- Pestañas de Navegación -->
+        <div class="tabs-container">
+            <button class="tab active" data-tab="scanner">📷 Escanear</button>
+            <button class="tab" data-tab="results">📋 Resultados</button>
+            <button class="tab" data-tab="history">🕐 Historial</button>
+            <button class="tab" data-tab="settings">⚙️ Ajustes</button>
+        </div>
+        
+        <!-- Sección: ESCANER -->
+        <div id="scanner" class="scanner-section">
+            <div class="scanner-frame">
+                <video id="scanner-video" playsinline></video>
+                <div class="scanner-overlay"></div>
+                <div class="scanner-line"></div>
+            </div>
+            
+            <div class="scanner-controls">
+                <button id="startScan" class="btn btn-primary">
+                    <span>▶</span> INICIAR ESCANEO
+                </button>
+                <button id="stopScan" class="btn btn-secondary" style="display: none;">
+                    <span>⏹</span> DETENER
+                </button>
+            </div>
+            
+            <div class="manual-input">
+                <p style="text-align: center; margin: 15px 0; color: var(--color-gris);">
+                    O ingresa el código manualmente:
+                </p>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="manualCode" 
+                           placeholder="Ej: PROD-001 o 123" 
+                           style="flex: 1; padding: 15px; border: 2px solid var(--color-gris-claro); border-radius: 10px; font-size: 16px;">
+                    <button id="searchBtn" class="btn btn-primary" style="width: auto; padding: 15px 20px;">
+                        🔍
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sección: RESULTADOS -->
+        <div id="results" class="results-section">
+            <div id="productInfo"></div>
+        </div>
+        
+        <!-- Sección: HISTORIAL -->
+        <div id="history" class="history-section">
+            <div style="text-align: center; margin: 20px 0;">
+                <button id="clearHistory" class="btn btn-secondary">
+                    🗑️ Limpiar Historial
+                </button>
+            </div>
+            <div class="history-list" id="historyList"></div>
+        </div>
+        
+        <!-- Sección: AJUSTES -->
+        <div id="settings" class="settings-section">
+            <div class="settings-card">
+                <h3 style="color: var(--color-vino); margin-bottom: 20px;">Configuración</h3>
+                
+                <div class="setting-item">
+                    <span class="setting-label">Sonido al escanear</span>
+                    <label class="switch">
+                        <input type="checkbox" id="soundToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-item">
+                    <span class="setting-label">Vibración al éxito</span>
+                    <label class="switch">
+                        <input type="checkbox" id="vibrationToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-item">
+                    <span class="setting-label">Guardar automáticamente</span>
+                    <label class="switch">
+                        <input type="checkbox" id="autoSaveToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="settings-card">
+                <h3 style="color: var(--color-vino); margin-bottom: 20px;">Base de Datos</h3>
+                
+                <div style="margin: 15px 0;">
+                    <p style="margin-bottom: 10px;">Productos cargados: <span id="productCount">0</span></p>
+                    <div style="background: var(--color-gris-claro); height: 10px; border-radius: 5px; overflow: hidden;">
+                        <div id="dbUsage" style="background: var(--color-vino); height: 100%; width: 0%;"></div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                    <button id="loadData" class="btn btn-primary">
+                        📥 Cargar desde Excel
+                    </button>
+                    <button id="exportData" class="btn btn-success">
+                        📤 Exportar a Excel
+                    </button>
+                    <button id="clearData" class="btn btn-secondary">
+                        🗑️ Limpiar Base de Datos
+                    </button>
+                </div>
+            </div>
+            
+            <div class="settings-card">
+                <h3 style="color: var(--color-vino); margin-bottom: 20px;">Información</h3>
+                <p style="margin-bottom: 10px;"><strong>Versión:</strong> 1.0.0</p>
+                <p style="margin-bottom: 10px;"><strong>Modo:</strong> <span id="appMode">Local</span></p>
+                <p><strong>Última sincronización:</strong> <span id="lastSync">Nunca</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal: Detalles del Producto -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Detalles Completos</h2>
+                <button class="close-modal" onclick="closeModal('productModal')">×</button>
+            </div>
+            <div id="modalProductContent"></div>
+        </div>
+    </div>
+    
+    <!-- Modal: Compartir -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Compartir Producto</h2>
+                <button class="close-modal" onclick="closeModal('shareModal')">×</button>
+            </div>
+            <div style="margin: 20px 0;">
+                <p>Selecciona cómo quieres compartir la información:</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0;">
+                    <button class="action-btn" style="background: #25D366; color: white;" onclick="shareViaWhatsApp()">
+                        <span>📱</span> WhatsApp
+                    </button>
+                    <button class="action-btn" style="background: #0088cc; color: white;" onclick="shareViaTelegram()">
+                        <span>✈️</span> Telegram
+                    </button>
+                    <button class="action-btn" style="background: #333; color: white;" onclick="saveAsPDF()">
+                        <span>📄</span> Guardar PDF
+                    </button>
+                    <button class="action-btn" style="background: #34A853; color: white;" onclick="saveAsImage()">
+                        <span>🖼️</span> Guardar Imagen
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <p style="margin-bottom: 10px; font-weight: 600;">Texto para compartir:</p>
+                    <textarea id="shareText" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;"></textarea>
+                    <button onclick="copyToClipboard()" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                        📋 Copiar Texto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script>
+        // ============================================
+        // VARIABLES GLOBALES Y CONFIGURACIÓN
+        // ============================================
+        const APP_NAME = "InventarioCOBATAB";
+        const DB_VERSION = 2;
+        let db = null;
+        let currentProduct = null;
+        let scannerActive = false;
+        let videoStream = null;
+        
+        // ============================================
+        // INICIALIZACIÓN DE LA APLICACIÓN
+        // ============================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Inicializar base de datos IndexedDB
+            await initDatabase();
+            
+            // Cargar configuración
+            loadSettings();
+            
+            // Configurar eventos
+            setupEventListeners();
+            
+            // Actualizar contadores
+            updateProductCount();
+            
+            // Mostrar historial
+            loadHistory();
+            
+            // Configurar navegación por pestañas
+            setupTabs();
+            
+            // Intentar cargar datos de ejemplo si la base está vacía
+            checkAndLoadSampleData();
+        });
+        
+        // ============================================
+        // BASE DE DATOS INDEXEDDB (LOCAL)
+        // ============================================
+        async function initDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(APP_NAME, DB_VERSION);
+                
+                request.onerror = (event) => {
+                    console.error("Error al abrir la base de datos:", event.target.error);
+                    showError("Error al inicializar la base de datos local");
+                    reject(event.target.error);
+                };
+                
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    console.log("Base de datos inicializada");
+                    resolve();
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    
+                    // Crear almacén para productos
+                    if (!db.objectStoreNames.contains('products')) {
+                        const productStore = db.createObjectStore('products', { keyPath: 'id' });
+                        productStore.createIndex('codigo', 'codigo', { unique: true });
+                        productStore.createIndex('categoria', 'categoria', { unique: false });
+                    }
+                    
+                    // Crear almacén para historial
+                    if (!db.objectStoreNames.contains('scanHistory')) {
+                        const historyStore = db.createObjectStore('scanHistory', { keyPath: 'id', autoIncrement: true });
+                        historyStore.createIndex('timestamp', 'timestamp', { unique: false });
+                    }
+                    
+                    // Crear almacén para configuración
+                    if (!db.objectStoreNames.contains('settings')) {
+                        const settingsStore = db.createObjectStore('settings', { keyPath: 'key' });
+                    }
+                    
+                    console.log("Estructura de base de datos creada");
+                };
+            });
+        }
+        
+        // ============================================
+        // FUNCIONES DE LA BASE DE DATOS
+        // ============================================
+        async function saveProduct(product) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['products'], 'readwrite');
+                const store = transaction.objectStore('products');
+                
+                // Asegurarse de que el ID sea numérico
+                product.id = parseInt(product.id);
+                
+                const request = store.put(product);
+                
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+        
+        async function getProductById(id) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['products'], 'readonly');
+                const store = transaction.objectStore('products');
+                
+                // Intentar buscar por ID numérico primero
+                let request = store.get(parseInt(id));
+                
+                request.onsuccess = () => {
+                    if (request.result) {
+                        resolve(request.result);
+                    } else {
+                        // Si no se encuentra por ID, buscar por código
+                        const index = store.index('codigo');
+                        request = index.get(id.toString());
+                        
+                        request.onsuccess = () => {
+                            if (request.result) {
+                                resolve(request.result);
+                            } else {
+                                reject(new Error("Producto no encontrado"));
+                            }
+                        };
+                        
+                        request.onerror = () => reject(request.error);
+                    }
+                };
+                
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        async function getAllProducts() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['products'], 'readonly');
+                const store = transaction.objectStore('products');
+                const request = store.getAll();
+                
+                request.onsuccess = () => resolve(request.result || []);
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        async function addToHistory(product) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['scanHistory'], 'readwrite');
+                const store = transaction.objectStore('scanHistory');
+                
+                const historyItem = {
+                    productId: product.id,
+                    codigo: product.codigo,
+                    nombre: product.nombre,
+                    timestamp: new Date().toISOString(),
+                    fecha: new Date().toLocaleString()
+                };
+                
+                const request = store.add(historyItem);
+                
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+        
+        async function getHistory() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['scanHistory'], 'readonly');
+                const store = transaction.objectStore('scanHistory');
+                const index = store.index('timestamp');
+                const request = index.getAll();
+                
+                request.onsuccess = () => {
+                    const history = request.result || [];
+                    // Ordenar por timestamp descendente
+                    history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    resolve(history);
+                };
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        async function clearHistory() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['scanHistory'], 'readwrite');
+                const store = transaction.objectStore('scanHistory');
+                const request = store.clear();
+                
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+        
+        // ============================================
+        // ESCANER DE CÓDIGOS QR
+        // ============================================
+        async function startScanner() {
+            try {
+                // Solicitar acceso a la cámara
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                });
+                
+                const videoElement = document.getElementById('scanner-video');
+                videoElement.srcObject = videoStream;
+                videoElement.play();
+                
+                // Cambiar estado de los botones
+                document.getElementById('startScan').style.display = 'none';
+                document.getElementById('stopScan').style.display = 'block';
+                scannerActive = true;
+                
+                // Configurar detección de códigos de barras/QR nativa
+                setupBarcodeDetection(videoElement);
+                
+                // Reproducir sonido si está activado
+                if (getSetting('soundToggle', true)) {
+                    playBeepSound();
+                }
+                
+            } catch (error) {
+                console.error("Error al acceder a la cámara:", error);
+                showError("No se pudo acceder a la cámara. Asegúrate de dar permisos.");
+            }
+        }
+        
+        function stopScanner() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            
+            const videoElement = document.getElementById('scanner-video');
+            videoElement.srcObject = null;
+            
+            document.getElementById('startScan').style.display = 'block';
+            document.getElementById('stopScan').style.display = 'none';
+            scannerActive = false;
+        }
+        
+        function setupBarcodeDetection(videoElement) {
+            // Usar la API de BarcodeDetector si está disponible (Chrome Android)
+            if ('BarcodeDetector' in window) {
+                const barcodeDetector = new BarcodeDetector({ 
+                    formats: ['qr_code', 'code_128', 'code_39', 'ean_13'] 
+                });
+                
+                function detectFrame() {
+                    if (!scannerActive) return;
+                    
+                    barcodeDetector.detect(videoElement)
+                        .then(barcodes => {
+                            if (barcodes.length > 0) {
+                                const code = barcodes[0].rawValue;
+                                processScannedCode(code);
+                                stopScanner();
+                            }
+                            if (scannerActive) {
+                                requestAnimationFrame(detectFrame);
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Error en detección:", err);
+                            if (scannerActive) {
+                                setTimeout(detectFrame, 100);
+                            }
+                        });
+                }
+                
+                detectFrame();
+                
+            } else {
+                // Alternativa para navegadores sin soporte nativo
+                showError("Tu navegador no soporta escaneo nativo. Usa Chrome en Android.");
+            }
+        }
+        
+        // ============================================
+        // PROCESAMIENTO DE CÓDIGOS ESCANEADOS
+        // ============================================
+        async function processScannedCode(code) {
+            console.log("Código escaneado:", code);
+            
+            // Extraer ID del producto
+            let productId = extractProductId(code);
+            if (!productId) productId = code;
+            
+            // Buscar producto
+            try {
+                const product = await getProductById(productId);
+                await showProductInfo(product);
+                
+                // Agregar al historial
+                await addToHistory(product);
+                loadHistory();
+                
+                // Cambiar a pestaña de resultados
+                switchTab('results');
+                
+                // Efectos de éxito
+                if (getSetting('soundToggle', true)) {
+                    playSuccessSound();
+                }
+                if (getSetting('vibrationToggle', true) && navigator.vibrate) {
+                    navigator.vibrate(200);
+                }
+                
+            } catch (error) {
+                console.error("Error buscando producto:", error);
+                showError(`Producto no encontrado: ${code}`);
+            }
+        }
+        
+        function extractProductId(code) {
+            // Intentar extraer de una URL
+            try {
+                if (code.includes('detalles_item.php')) {
+                    const match = code.match(/id=(\d+)/);
+                    if (match) return match[1];
+                }
+                
+                // Intentar extraer de cualquier URL
+                const url = new URL(code);
+                const params = new URLSearchParams(url.search);
+                return params.get('id');
+                
+            } catch (e) {
+                // No es una URL, devolver el código tal cual
+                return code;
+            }
+        }
+        
+        // ============================================
+        // MOSTRAR INFORMACIÓN DEL PRODUCTO
+        // ============================================
+        async function showProductInfo(product) {
+            currentProduct = product;
+            
+            // Determinar clase del badge según estado
+            let statusClass = 'status-available';
+            let statusText = 'Disponible';
+            
+            switch(product.estado?.toLowerCase()) {
+                case 'en_uso':
+                    statusClass = 'status-inuse';
+                    statusText = 'En uso';
+                    break;
+                case 'mantenimiento':
+                    statusClass = 'status-maintenance';
+                    statusText = 'Mantenimiento';
+                    break;
+                case 'baja':
+                    statusClass = 'status-low';
+                    statusText = 'Baja';
+                    break;
+            }
+            
+            // Formatear fecha
+            let fechaAdq = 'No especificada';
+            if (product.fecha_adquisicion || product.fecha_creacion) {
+                const fecha = product.fecha_adquisicion || product.fecha_creacion;
+                fechaAdq = new Date(fecha).toLocaleDateString('es-MX');
+            }
+            
+            // Crear HTML del producto
+            const html = `
+                <div class="product-card">
+                    <div class="product-header">
+                        <div>
+                            <div class="product-name">${product.nombre || 'Sin nombre'}</div>
+                            <div class="product-code">${product.codigo || 'Sin código'}</div>
+                        </div>
+                        <div class="status-badge ${statusClass}">${statusText}</div>
+                    </div>
+                    
+                    <div class="product-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Categoría:</span>
+                            <span class="detail-value">${product.categoria || 'Sin categoría'}</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Cantidad:</span>
+                            <span class="detail-value">
+                                ${product.cantidad || 0} ${product.unidad_medida || 'unidades'}
+                            </span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Valor unitario:</span>
+                            <span class="detail-value">
+                                $${parseFloat(product.valor || 0).toFixed(2)}
+                            </span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Valor total:</span>
+                            <span class="detail-value value-highlight">
+                                $${parseFloat((product.valor || 0) * (product.cantidad || 1)).toFixed(2)}
+                            </span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Ubicación:</span>
+                            <span class="detail-value">${product.ubicacion || 'No especificada'}</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Fecha adquisición:</span>
+                            <span class="detail-value">${fechaAdq}</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Responsable:</span>
+                            <span class="detail-value">${product.responsable || 'No asignado'}</span>
+                        </div>
+                    </div>
+                    
+                    ${product.descripcion ? `
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                            <p style="color: #666; font-size: 14px;"><strong>Descripción:</strong> ${product.descripcion}</p>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="product-actions">
+                        <button class="action-btn" style="background: var(--color-azul); color: white;" onclick="showProductDetails()">
+                            <span>📖</span> Más detalles
+                        </button>
+                        <button class="action-btn" style="background: var(--color-verde); color: white;" onclick="openShareModal()">
+                            <span>📤</span> Compartir
+                        </button>
+                        <button class="action-btn" style="background: #6f42c1; color: white;" onclick="saveProductCard()">
+                            <span>💾</span> Guardar
+                        </button>
+                        <button class="action-btn" style="background: #fd7e14; color: white;" onclick="printProductCard()">
+                            <span>🖨️</span> Imprimir
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('productInfo').innerHTML = html;
+        }
+        
+        // ============================================
+        // FUNCIONES DE COMPARTIR Y DESCARGAR
+        // ============================================
+        function openShareModal() {
+            if (!currentProduct) return;
+            
+            // Generar texto para compartir
+            const shareText = generateShareText();
+            document.getElementById('shareText').value = shareText;
+            
+            // Mostrar modal
+            openModal('shareModal');
+        }
+        
+        function generateShareText() {
+            const product = currentProduct;
+            const totalValue = (product.valor || 0) * (product.cantidad || 1);
+            
+            return `📦 *INVENTARIO COBATAB - PRODUCTO ENCONTRADO*
+
+*Producto:* ${product.nombre || 'Sin nombre'}
+*Código:* ${product.codigo || 'Sin código'}
+*Categoría:* ${product.categoria || 'Sin categoría'}
+*Estado:* ${product.estado || 'No especificado'}
+*Cantidad:* ${product.cantidad || 0} ${product.unidad_medida || 'unidades'}
+*Valor unitario:* $${parseFloat(product.valor || 0).toFixed(2)}
+*Valor total:* $${parseFloat(totalValue).toFixed(2)}
+*Ubicación:* ${product.ubicacion || 'No especificada'}
+*Responsable:* ${product.responsable || 'No asignado'}
+*Fecha:* ${new Date().toLocaleDateString('es-MX')}
+
+_Escaneado con la app de inventario COBATAB_`;
+        }
+        
+        function shareViaWhatsApp() {
+            const text = encodeURIComponent(generateShareText());
+            const url = `https://wa.me/?text=${text}`;
+            window.open(url, '_blank');
+        }
+        
+        function shareViaTelegram() {
+            const text = encodeURIComponent(generateShareText());
+            const url = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${text}`;
+            window.open(url, '_blank');
+        }
+        
+        async function saveAsPDF() {
+            // Crear un HTML para el PDF
+            const product = currentProduct;
+            const totalValue = (product.valor || 0) * (product.cantidad || 1);
+            
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .title { color: #8B0000; font-size: 24px; }
+                        .subtitle { color: #666; }
+                        .product-info { margin: 20px 0; }
+                        .info-row { margin: 10px 0; }
+                        .label { font-weight: bold; color: #333; }
+                        .value { margin-left: 10px; }
+                        .footer { margin-top: 40px; text-align: center; color: #666; font-size: 12px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1 class="title">COBATAB Plantel 09</h1>
+                        <p class="subtitle">Ficha Técnica de Producto</p>
+                        <p>Fecha: ${new Date().toLocaleDateString('es-MX')}</p>
+                    </div>
+                    
+                    <div class="product-info">
+                        <h2>${product.nombre}</h2>
+                        <div class="info-row"><span class="label">Código:</span> <span class="value">${product.codigo}</span></div>
+                        <div class="info-row"><span class="label">Categoría:</span> <span class="value">${product.categoria}</span></div>
+                        <div class="info-row"><span class="label">Estado:</span> <span class="value">${product.estado}</span></div>
+                        <div class="info-row"><span class="label">Cantidad:</span> <span class="value">${product.cantidad} ${product.unidad_medida}</span></div>
+                        <div class="info-row"><span class="label">Valor unitario:</span> <span class="value">$${parseFloat(product.valor).toFixed(2)}</span></div>
+                        <div class="info-row"><span class="label">Valor total:</span> <span class="value">$${parseFloat(totalValue).toFixed(2)}</span></div>
+                        <div class="info-row"><span class="label">Ubicación:</span> <span class="value">${product.ubicacion}</span></div>
+                        <div class="info-row"><span class="label">Responsable:</span> <span class="value">${product.responsable}</span></div>
+                        <div class="info-row"><span class="label">Descripción:</span> <span class="value">${product.descripcion || 'Sin descripción'}</span></div>
+                    </div>
+                    
+                    <div class="footer">
+                        <p>Documento generado por la App de Inventario COBATAB</p>
+                        <p>${window.location.href}</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            // Para una implementación real de PDF, necesitarías una librería como jsPDF
+            // Esta es una versión simplificada
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `producto_${product.codigo}_${new Date().getTime()}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showMessage('✅ Documento listo para guardar', 'success');
+        }
+        
+        async function saveAsImage() {
+            const productCard = document.querySelector('.product-card');
+            if (!productCard) return;
+            
+            try {
+                // Usar html2canvas para capturar la tarjeta como imagen
+                if (typeof html2canvas !== 'undefined') {
+                    const canvas = await html2canvas(productCard);
+                    const image = canvas.toDataURL('image/png');
+                    
+                    const a = document.createElement('a');
+                    a.href = image;
+                    a.download = `producto_${currentProduct.codigo}_${new Date().getTime()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    
+                    showMessage('✅ Imagen guardada', 'success');
+                } else {
+                    // Si no hay html2canvas, usar alternativa simple
+                    showMessage('ℹ️ Para guardar como imagen, agrega la librería html2canvas', 'info');
+                }
+            } catch (error) {
+                console.error("Error al guardar imagen:", error);
+                showError("Error al guardar la imagen");
+            }
+        }
+        
+        function copyToClipboard() {
+            const textarea = document.getElementById('shareText');
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); // Para móviles
+            
+            try {
+                navigator.clipboard.writeText(textarea.value)
+                    .then(() => showMessage('✅ Texto copiado al portapapeles', 'success'))
+                    .catch(() => {
+                        // Fallback para navegadores antiguos
+                        document.execCommand('copy');
+                        showMessage('✅ Texto copiado', 'success');
+                    });
+            } catch (error) {
+                showError("Error al copiar texto");
+            }
+        }
+        
+        // ============================================
+        // FUNCIONES AUXILIARES
+        // ============================================
+        function setupEventListeners() {
+            // Escáner
+            document.getElementById('startScan').addEventListener('click', startScanner);
+            document.getElementById('stopScan').addEventListener('click', stopScanner);
+            document.getElementById('searchBtn').addEventListener('click', () => {
+                const code = document.getElementById('manualCode').value.trim();
+                if (code) {
+                    processScannedCode(code);
+                    document.getElementById('manualCode').value = '';
+                }
+            });
+            
+            document.getElementById('manualCode').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const code = document.getElementById('manualCode').value.trim();
+                    if (code) {
+                        processScannedCode(code);
+                        document.getElementById('manualCode').value = '';
+                    }
+                }
+            });
+            
+            // Historial
+            document.getElementById('clearHistory').addEventListener('click', async () => {
+                if (confirm('¿Borrar todo el historial de escaneos?')) {
+                    await clearHistory();
+                    loadHistory();
+                    showMessage('✅ Historial limpiado', 'success');
+                }
+            });
+            
+            // Configuración
+            document.getElementById('soundToggle').addEventListener('change', saveSettings);
+            document.getElementById('vibrationToggle').addEventListener('change', saveSettings);
+            document.getElementById('autoSaveToggle').addEventListener('change', saveSettings);
+            
+            document.getElementById('loadData').addEventListener('click', loadSampleData);
+            document.getElementById('exportData').addEventListener('click', exportToExcel);
+            document.getElementById('clearData').addEventListener('click', () => {
+                if (confirm('¿Borrar todos los productos de la base de datos?')) {
+                    clearAllProducts();
+                }
+            });
+            
+            // Botones del header
+            document.getElementById('syncBtn').addEventListener('click', syncWithServer);
+            document.getElementById('infoBtn').addEventListener('click', () => {
+                alert('App de Inventario COBATAB\n\nVersión: 1.0.0\nModo: Local\n\nEscanea códigos QR para ver información de productos.\nFunciona completamente sin internet.');
+            });
+        }
+        
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+        }
+        
+        function switchTab(tabId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('[class$="-section"]').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(tabId).style.display = 'block';
+            
+            // Actualizar pestañas activas
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Detener escáner si está activo
+            if (scannerActive) {
+                stopScanner();
+            }
+        }
+        
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        function showProductDetails() {
+            if (!currentProduct) return;
+            
+            const modalContent = document.getElementById('modalProductContent');
+            modalContent.innerHTML = `
+                <h3>${currentProduct.nombre}</h3>
+                <p><strong>Código:</strong> ${currentProduct.codigo}</p>
+                <p><strong>Número de serie:</strong> ${currentProduct.numero_serie || 'N/A'}</p>
+                <p><strong>Categoría:</strong> ${currentProduct.categoria}</p>
+                <p><strong>Estado:</strong> ${currentProduct.estado}</p>
+                <p><strong>Cantidad:</strong> ${currentProduct.cantidad} ${currentProduct.unidad_medida}</p>
+                <p><strong>Valor unitario:</strong> $${parseFloat(currentProduct.valor).toFixed(2)}</p>
+                <p><strong>Valor total:</strong> $${parseFloat(currentProduct.valor * currentProduct.cantidad).toFixed(2)}</p>
+                <p><strong>Ubicación:</strong> ${currentProduct.ubicacion || 'No especificada'}</p>
+                <p><strong>Proveedor:</strong> ${currentProduct.proveedor || 'No especificado'}</p>
+                <p><strong>Fecha adquisición:</strong> ${new Date(currentProduct.fecha_adquisicion || currentProduct.fecha_creacion).toLocaleDateString('es-MX')}</p>
+                <p><strong>Responsable:</strong> ${currentProduct.responsable || 'No asignado'}</p>
+                ${currentProduct.descripcion ? `<p><strong>Descripción:</strong><br>${currentProduct.descripcion}</p>` : ''}
+                ${currentProduct.notas ? `<p><strong>Notas:</strong><br>${currentProduct.notas}</p>` : ''}
+            `;
+            
+            openModal('productModal');
+        }
+        
+        // ============================================
+        // CONFIGURACIÓN Y PERSISTENCIA
+        // ============================================
+        function saveSettings() {
+            const settings = {
+                soundToggle: document.getElementById('soundToggle').checked,
+                vibrationToggle: document.getElementById('vibrationToggle').checked,
+                autoSaveToggle: document.getElementById('autoSaveToggle').checked
+            };
+            
+            localStorage.setItem('appSettings', JSON.stringify(settings));
+        }
+        
+        function loadSettings() {
+            const saved = localStorage.getItem('appSettings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                document.getElementById('soundToggle').checked = settings.soundToggle !== false;
+                document.getElementById('vibrationToggle').checked = settings.vibrationToggle !== false;
+                document.getElementById('autoSaveToggle').checked = settings.autoSaveToggle !== false;
+            }
+        }
+        
+        function getSetting(key, defaultValue) {
+            const saved = localStorage.getItem('appSettings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                return settings[key] !== undefined ? settings[key] : defaultValue;
+            }
+            return defaultValue;
+        }
+        
+        // ============================================
+        // SONIDOS Y EFECTOS
+        // ============================================
+        function playBeepSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } catch (error) {
+                console.log("Audio no disponible");
+            }
+        }
+        
+        function playSuccessSound() {
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ');
+                audio.play();
+            } catch (error) {
+                // Silenciar error de audio
+            }
+        }
+        
+        // ============================================
+        // CARGA DE DATOS DE EJEMPLO
+        // ============================================
+        async function checkAndLoadSampleData() {
+            const products = await getAllProducts();
+            if (products.length === 0) {
+                // Preguntar si quiere cargar datos de ejemplo
+                if (confirm('¿Deseas cargar datos de ejemplo para probar la app?')) {
+                    await loadSampleData();
+                }
+            }
+        }
+        
+        async function loadSampleData() {
+            const sampleProducts = [
+                {
+                    id: 1,
+                    codigo: "PROD-001",
+                    nombre: "Laptop Dell Inspiron 15",
+                    categoria: "Equipo de Cómputo",
+                    descripcion: "Laptop para uso administrativo",
+                    cantidad: 5,
+                    unidad_medida: "unidades",
+                    valor: 15000.00,
+                    estado: "disponible",
+                    ubicacion: "Sala de Profesores",
+                    responsable: "Administración",
+                    fecha_adquisicion: "2023-01-15",
+                    proveedor: "Dell México"
+                },
+                {
+                    id: 2,
+                    codigo: "PROD-002",
+                    nombre: "Proyector Epson EB-X41",
+                    categoria: "Audiovisual",
+                    descripcion: "Proyector para aulas",
+                    cantidad: 3,
+                    unidad_medida: "unidades",
+                    valor: 8000.00,
+                    estado: "en_uso",
+                    ubicacion: "Aula 101",
+                    responsable: "Prof. Juan Pérez",
+                    fecha_adquisicion: "2023-02-20",
+                    proveedor: "Epson"
+                },
+                {
+                    id: 3,
+                    codigo: "PROD-003",
+                    nombre: "Silla Ejecutiva",
+                    categoria: "Mobiliario",
+                    descripcion: "Silla para oficina",
+                    cantidad: 20,
+                    unidad_medida: "unidades",
+                    valor: 1200.00,
+                    estado: "disponible",
+                    ubicacion: "Almacén",
+                    responsable: "Almacén",
+                    fecha_adquisicion: "2023-03-10",
+                    proveedor: "Office Depot"
+                },
+                {
+                    id: 4,
+                    codigo: "PROD-004",
+                    nombre: "Extintor ABC 5kg",
+                    categoria: "Seguridad",
+                    descripcion: "Extintor para incendios",
+                    cantidad: 8,
+                    unidad_medida: "unidades",
+                    valor: 1500.00,
+                    estado: "mantenimiento",
+                    ubicacion: "Pasillos",
+                    responsable: "Seguridad",
+                    fecha_adquisicion: "2022-11-05",
+                    proveedor: "Protección Civil"
+                },
+                {
+                    id: 5,
+                    codigo: "PROD-005",
+                    nombre: "Kit de Laboratorio Química",
+                    categoria: "Laboratorio",
+                    descripcion: "Kit básico para prácticas",
+                    cantidad: 2,
+                    unidad_medida: "kits",
+                    valor: 5000.00,
+                    estado: "disponible",
+                    ubicacion: "Lab. Química",
+                    responsable: "Dra. María López",
+                    fecha_adquisicion: "2023-04-15",
+                    proveedor: "Científica Mérida"
+                }
+            ];
+            
+            try {
+                for (const product of sampleProducts) {
+                    await saveProduct(product);
+                }
+                
+                updateProductCount();
+                showMessage('✅ Datos de ejemplo cargados', 'success');
+                
+            } catch (error) {
+                showError("Error al cargar datos de ejemplo");
+            }
+        }
+        
+        async function exportToExcel() {
+            try {
+                const products = await getAllProducts();
+                
+                // Crear contenido CSV
+                let csv = 'Código,Nombre,Categoría,Cantidad,Valor,Estado,Ubicación,Responsable\n';
+                
+                products.forEach(product => {
+                    csv += `"${product.codigo}","${product.nombre}","${product.categoria}",${product.cantidad},${product.valor},"${product.estado}","${product.ubicacion}","${product.responsable}"\n`;
+                });
+                
+                // Crear y descargar archivo
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `inventario_cobatab_${new Date().getTime()}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showMessage('✅ Datos exportados a CSV', 'success');
+                
+            } catch (error) {
+                showError("Error al exportar datos");
+            }
+        }
+        
+        async function clearAllProducts() {
+            try {
+                const transaction = db.transaction(['products'], 'readwrite');
+                const store = transaction.objectStore('products');
+                await store.clear();
+                
+                updateProductCount();
+                showMessage('✅ Base de datos limpiada', 'success');
+                
+            } catch (error) {
+                showError("Error al limpiar base de datos");
+            }
+        }
+        
+        // ============================================
+        // UI HELPERS
+        // ============================================
+        async function updateProductCount() {
+            try {
+                const products = await getAllProducts();
+                document.getElementById('productCount').textContent = products.length;
+                
+                // Calcular uso aproximado
+                const usage = Math.min(products.length * 2, 100); // 2% por producto
+                document.getElementById('dbUsage').style.width = usage + '%';
+                
+            } catch (error) {
+                console.error("Error actualizando contador:", error);
+            }
+        }
+        
+        async function loadHistory() {
+            try {
+                const history = await getHistory();
+                const historyList = document.getElementById('historyList');
+                
+                if (history.length === 0) {
+                    historyList.innerHTML = `
+                        <div style="text-align: center; padding: 40px 20px; color: #666;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">📋</div>
+                            <p>No hay escaneos recientes</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                history.forEach(item => {
+                    html += `
+                        <div class="history-item">
+                            <div class="history-info">
+                                <div class="history-time">${item.fecha}</div>
+                                <div class="history-name">${item.nombre}</div>
+                                <div class="history-code">${item.codigo}</div>
+                            </div>
+                            <button class="history-action" onclick="loadProductFromHistory(${item.productId})">
+                                👁️
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                historyList.innerHTML = html;
+                
+            } catch (error) {
+                console.error("Error cargando historial:", error);
+            }
+        }
+        
+        async function loadProductFromHistory(productId) {
+            try {
+                const product = await getProductById(productId);
+                await showProductInfo(product);
+                switchTab('results');
+            } catch (error) {
+                showError("Error al cargar producto del historial");
+            }
+        }
+        
+        function showMessage(message, type = 'info') {
+            // Crear elemento de mensaje
+            const messageEl = document.createElement('div');
+            messageEl.style.cssText = `
+                position: fixed;
+                top: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 15px 25px;
+                border-radius: 10px;
+                background: ${type === 'success' ? '#d4edda' : type === 'error' ? '#f8d7da' : '#d1ecf1'};
+                color: ${type === 'success' ? '#155724' : type === 'error' ? '#721c24' : '#0c5460'};
+                border: 1px solid ${type === 'success' ? '#c3e6cb' : type === 'error' ? '#f5c6cb' : '#bee5eb'};
+                z-index: 3000;
+                font-weight: 600;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+                animation: slideDown 0.3s ease-out;
+            `;
+            
+            // Animación CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideDown {
+                    from { top: 50px; opacity: 0; }
+                    to { top: 100px; opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            messageEl.textContent = message;
+            document.body.appendChild(messageEl);
+            
+            // Remover después de 3 segundos
+            setTimeout(() => {
+                messageEl.style.animation = 'slideUp 0.3s ease-out';
+                setTimeout(() => document.body.removeChild(messageEl), 300);
+            }, 3000);
+        }
+        
+        function showError(message) {
+            showMessage(message, 'error');
+        }
+        
+        function syncWithServer() {
+            showMessage('ℹ️ Modo local - La sincronización está desactivada', 'info');
+        }
+        
+        // ============================================
+        // INSTALACIÓN COMO PWA
+        // ============================================
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/Plantel-09/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Error registrando ServiceWorker:', error);
+                    });
+            });
+        }
+        
+        // Detectar si se está ejecutando como PWA
+        window.addEventListener('appinstalled', () => {
+            showMessage('✅ App instalada correctamente', 'success');
+        });
+        
+        // Solicitar instalación como PWA
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Mostrar botón de instalación
+            const installBtn = document.createElement('button');
+            installBtn.textContent = '📲 Instalar App';
+            installBtn.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: #8B0000;
+                color: white;
+                border: none;
+                border-radius: 25px;
+                font-weight: bold;
+                box-shadow: 0 4px 15px rgba(139,0,0,0.3);
+                z-index: 1000;
+                cursor: pointer;
+            `;
+            
+            installBtn.onclick = async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        showMessage('✅ App instalada', 'success');
+                    }
+                    deferredPrompt = null;
+                    document.body.removeChild(installBtn);
+                }
+            };
+            
+            document.body.appendChild(installBtn);
+            
+            // Ocultar después de 10 segundos
+            setTimeout(() => {
+                if (installBtn.parentNode) {
+                    document.body.removeChild(installBtn);
+                }
+            }, 10000);
+        });
+    </script>
+</body>
+</html>
