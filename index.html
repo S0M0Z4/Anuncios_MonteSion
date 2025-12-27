@@ -159,11 +159,111 @@
             background-color: #b91c1c;
         }
         
+        /* Botón de volver */
+        .back-btn {
+            background-color: var(--gris);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            display: none;
+        }
+        
+        .back-btn:hover {
+            background-color: #6b7280;
+        }
+        
         /* Contenedor principal */
         .container {
             max-width: 1200px;
             margin: 2rem auto;
             padding: 0 1.5rem;
+        }
+        
+        /* Pantalla de selección de departamento */
+        .department-selection {
+            background-color: var(--blanco);
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            box-shadow: var(--sombra);
+            text-align: center;
+        }
+        
+        .department-selection h2 {
+            color: var(--azul-principal);
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+        }
+        
+        .departments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .department-card {
+            background-color: var(--azul-claro);
+            border-radius: 8px;
+            padding: 2rem 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .department-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--sombra);
+            border-color: var(--azul-secundario);
+        }
+        
+        .department-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--azul-principal);
+        }
+        
+        .department-card h3 {
+            color: var(--azul-principal);
+            margin-bottom: 0.5rem;
+        }
+        
+        .department-card p {
+            color: var(--gris-oscuro);
+            font-size: 0.9rem;
+        }
+        
+        .others-option {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--azul-claro);
+        }
+        
+        .others-option h3 {
+            color: var(--azul-principal);
+            margin-bottom: 1rem;
+        }
+        
+        .others-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .others-form input {
+            padding: 0.8rem;
+            border: 1px solid var(--gris);
+            border-radius: 4px;
+        }
+        
+        .others-form input:focus {
+            outline: none;
+            border-color: var(--azul-secundario);
         }
         
         /* Sección de formulario de anuncios */
@@ -173,6 +273,11 @@
             padding: 2rem;
             box-shadow: var(--sombra);
             margin-bottom: 2rem;
+            display: none;
+        }
+        
+        .announcement-form-section.active {
+            display: block;
         }
         
         .section-title {
@@ -235,30 +340,31 @@
             background-color: #1d4ed8;
         }
         
-        /* Sección de anuncios */
+        /* Sección para mostrar anuncios */
         .announcements-section {
             background-color: var(--blanco);
             border-radius: 8px;
             padding: 2rem;
             box-shadow: var(--sombra);
+            display: none;
         }
         
-        .category-filter {
+        .announcements-section.active {
+            display: block;
+        }
+        
+        .current-department {
+            background-color: var(--azul-claro);
+            padding: 1rem;
+            border-radius: 8px;
             margin-bottom: 1.5rem;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 1rem;
         }
         
-        .category-filter label {
-            font-weight: 500;
-        }
-        
-        .category-filter select {
-            padding: 0.5rem;
-            border: 1px solid var(--gris);
-            border-radius: 4px;
-            min-width: 200px;
+        .current-department h3 {
+            color: var(--azul-principal);
         }
         
         .announcements-container {
@@ -401,6 +507,11 @@
         
         /* Panel de administrador */
         .admin-panel {
+            background-color: var(--blanco);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--sombra);
+            margin-top: 2rem;
             display: none;
         }
         
@@ -469,6 +580,10 @@
                 margin-top: 1rem;
             }
             
+            .departments-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
             .announcement-form {
                 grid-template-columns: 1fr;
             }
@@ -515,29 +630,72 @@
                 </p>
             </div>
             <button id="logoutBtn" class="logout-btn">Cerrar Sesión</button>
+            <button id="backBtn" class="back-btn">← Volver a Departamentos</button>
         </div>
     </header>
 
     <!-- Contenido principal -->
     <main class="container">
-        <!-- Formulario para crear anuncios -->
-        <section class="announcement-form-section">
-            <h2 class="section-title">Crear Nuevo Anuncio</h2>
-            <form id="announcementForm" class="announcement-form">
-                <div class="form-control">
-                    <label for="category">Categoría:</label>
-                    <select id="category" required>
-                        <option value="" disabled selected>Selecciona una categoría</option>
-                        <option value="Ministerio Juvenil">Ministerio Juvenil</option>
-                        <option value="Ministerio Personal">Ministerio Personal</option>
-                        <option value="Ministerio de la Mujer">Ministerio de la Mujer</option>
-                        <option value="Ancianos">Ancianos</option>
-                        <option value="Diáconos">Diáconos</option>
-                        <option value="Escuela Sabática">Escuela Sabática</option>
-                        <option value="Evangelismo">Evangelismo</option>
-                        <option value="Música y Alabanza">Música y Alabanza</option>
-                    </select>
+        <!-- Pantalla de selección de departamento -->
+        <section id="departmentSelection" class="department-selection">
+            <h2>Selecciona tu Departamento o Ministerio</h2>
+            <div class="departments-grid">
+                <div class="department-card" data-department="Ministerio Juvenil">
+                    <div class="department-icon">👨‍🎓</div>
+                    <h3>Ministerio Juvenil</h3>
+                    <p>Anuncios para jóvenes y actividades juveniles</p>
                 </div>
+                <div class="department-card" data-department="Ministerio Personal">
+                    <div class="department-icon">🙏</div>
+                    <h3>Ministerio Personal</h3>
+                    <p>Anuncios personales y espirituales</p>
+                </div>
+                <div class="department-card" data-department="Ministerio de la Mujer">
+                    <div class="department-icon">👩</div>
+                    <h3>Ministerio de la Mujer</h3>
+                    <p>Actividades y anuncios para mujeres</p>
+                </div>
+                <div class="department-card" data-department="Ancianos">
+                    <div class="department-icon">👴</div>
+                    <h3>Ancianos</h3>
+                    <p>Anuncios del consejo de ancianos</p>
+                </div>
+                <div class="department-card" data-department="Diáconos">
+                    <div class="department-icon">👨‍💼</div>
+                    <h3>Diáconos</h3>
+                    <p>Anuncios del grupo de diáconos</p>
+                </div>
+                <div class="department-card" data-department="Escuela Sabática">
+                    <div class="department-icon">📚</div>
+                    <h3>Escuela Sabática</h3>
+                    <p>Anuncios de clases y estudios bíblicos</p>
+                </div>
+                <div class="department-card" data-department="Evangelismo">
+                    <div class="department-icon">📢</div>
+                    <h3>Evangelismo</h3>
+                    <p>Anuncios de campañas evangelísticas</p>
+                </div>
+                <div class="department-card" data-department="Música y Alabanza">
+                    <div class="department-icon">🎵</div>
+                    <h3>Música y Alabanza</h3>
+                    <p>Anuncios del grupo de alabanza</p>
+                </div>
+            </div>
+            
+            <div class="others-option">
+                <h3>¿No encuentras tu departamento?</h3>
+                <div class="others-form">
+                    <input type="text" id="otherDepartment" placeholder="Escribe el nombre de tu departamento">
+                    <button id="goToOtherDepartment" class="submit-btn">Ir a este departamento</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de formulario de anuncios -->
+        <section id="announcementFormSection" class="announcement-form-section">
+            <h2 class="section-title" id="formSectionTitle">Crear Nuevo Anuncio</h2>
+            <form id="announcementForm" class="announcement-form">
+                <input type="hidden" id="selectedDepartment">
                 <div class="form-control">
                     <label for="time">Hora del evento:</label>
                     <input type="time" id="time" required>
@@ -563,33 +721,22 @@
             <div id="formMessage" class="message"></div>
         </section>
 
-        <!-- Sección para mostrar anuncios (visible para todos) -->
-        <section class="announcements-section">
-            <h2 class="section-title">Anuncios Publicados</h2>
-            <div class="category-filter">
-                <label for="filterCategory">Filtrar por categoría:</label>
-                <select id="filterCategory">
-                    <option value="all">Todas las categorías</option>
-                    <option value="Ministerio Juvenil">Ministerio Juvenil</option>
-                    <option value="Ministerio Personal">Ministerio Personal</option>
-                    <option value="Ministerio de la Mujer">Ministerio de la Mujer</option>
-                    <option value="Ancianos">Ancianos</option>
-                    <option value="Diáconos">Diáconos</option>
-                    <option value="Escuela Sabática">Escuela Sabática</option>
-                    <option value="Evangelismo">Evangelismo</option>
-                    <option value="Música y Alabanza">Música y Alabanza</option>
-                </select>
+        <!-- Sección para mostrar anuncios del departamento -->
+        <section id="announcementsSection" class="announcements-section">
+            <div class="current-department">
+                <h3 id="currentDepartmentTitle">Anuncios del Departamento</h3>
+                <button id="createAnnouncementBtn" class="submit-btn" style="padding: 0.5rem 1rem;">+ Crear Anuncio</button>
             </div>
             <div id="announcementsContainer" class="announcements-container">
                 <!-- Los anuncios se cargarán aquí dinámicamente -->
                 <div class="empty-message" id="emptyMessage">
-                    No hay anuncios para mostrar. ¡Crea el primer anuncio!
+                    No hay anuncios para este departamento. ¡Crea el primer anuncio!
                 </div>
             </div>
         </section>
 
         <!-- Panel de administrador (solo visible al iniciar sesión) -->
-        <section id="adminPanel" class="announcements-section admin-panel">
+        <section id="adminPanel" class="admin-panel">
             <h2 class="section-title">Panel de Administrador - Todos los Anuncios</h2>
             <div id="adminAnnouncements" class="admin-announcements">
                 <!-- Los anuncios del panel de administrador se cargarán aquí -->
@@ -612,18 +759,8 @@
                 <input type="hidden" id="editAuthor">
                 <div class="announcement-form">
                     <div class="form-control">
-                        <label for="editCategory">Categoría:</label>
-                        <select id="editCategory" required>
-                            <option value="" disabled selected>Selecciona una categoría</option>
-                            <option value="Ministerio Juvenil">Ministerio Juvenil</option>
-                            <option value="Ministerio Personal">Ministerio Personal</option>
-                            <option value="Ministerio de la Mujer">Ministerio de la Mujer</option>
-                            <option value="Ancianos">Ancianos</option>
-                            <option value="Diáconos">Diáconos</option>
-                            <option value="Escuela Sabática">Escuela Sabática</option>
-                            <option value="Evangelismo">Evangelismo</option>
-                            <option value="Música y Alabanza">Música y Alabanza</option>
-                        </select>
+                        <label for="editDepartment">Departamento:</label>
+                        <input type="text" id="editDepartment" readonly style="background-color: #f3f4f6;">
                     </div>
                     <div class="form-control">
                         <label for="editTime">Hora del evento:</label>
@@ -659,7 +796,7 @@
         const initialAnnouncements = [
             {
                 id: 1,
-                category: "Ministerio Juvenil",
+                department: "Ministerio Juvenil",
                 time: "18:00",
                 title: "Retiro Espiritual Juvenil",
                 description: "Retiro juvenil en la montaña este fin de semana. Traer ropa abrigadora y Biblia.",
@@ -669,7 +806,7 @@
             },
             {
                 id: 2,
-                category: "Escuela Sabática",
+                department: "Escuela Sabática",
                 time: "09:30",
                 title: "Estudio de la Lección 5",
                 description: "Estudio de la lección de esta semana en el salón principal. Todos invitados.",
@@ -679,13 +816,23 @@
             },
             {
                 id: 3,
-                category: "Ministerio de la Mujer",
+                department: "Ministerio de la Mujer",
                 time: "15:00",
                 title: "Reunión de Oración",
                 description: "Reunión de oración especial por las familias de la congregación.",
                 date: "2023-10-18",
                 author: "Hermana Luisa",
                 authorId: "luisa_hermana"
+            },
+            {
+                id: 4,
+                department: "Música y Alabanza",
+                time: "19:00",
+                title: "Ensayo de Alabanza",
+                description: "Ensayo general del grupo de alabanza este viernes.",
+                date: "2023-10-22",
+                author: "Director David",
+                authorId: "david_director"
             }
         ];
 
@@ -695,26 +842,42 @@
             password: "Aa.1234#"
         };
 
+        // Departamentos predefinidos
+        const DEPARTMENTS = [
+            "Ministerio Juvenil",
+            "Ministerio Personal", 
+            "Ministerio de la Mujer",
+            "Ancianos",
+            "Diáconos",
+            "Escuela Sabática",
+            "Evangelismo",
+            "Música y Alabanza"
+        ];
+
         // Estado de la aplicación
         let announcements = [];
         let isAdminLoggedIn = false;
-        let nextId = 4;
+        let nextId = 5;
         let isEditing = false;
         let currentEditId = null;
         let currentUser = null;
+        let currentDepartment = null;
+        let currentView = 'departmentSelection'; // 'departmentSelection', 'announcements', 'form'
 
         // Elementos del DOM
         const loginBtn = document.getElementById('loginBtn');
         const logoutBtn = document.getElementById('logoutBtn');
+        const backBtn = document.getElementById('backBtn');
         const loginForm = document.getElementById('loginForm');
         const submitLogin = document.getElementById('submitLogin');
         const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
-        const announcementForm = document.getElementById('announcementForm');
+        const departmentSelection = document.getElementById('departmentSelection');
+        const announcementFormSection = document.getElementById('announcementFormSection');
+        const announcementsSection = document.getElementById('announcementsSection');
         const announcementsContainer = document.getElementById('announcementsContainer');
         const adminPanel = document.getElementById('adminPanel');
         const adminAnnouncements = document.getElementById('adminAnnouncements');
-        const filterCategory = document.getElementById('filterCategory');
         const formMessage = document.getElementById('formMessage');
         const emptyMessage = document.getElementById('emptyMessage');
         const adminEmptyMessage = document.getElementById('adminEmptyMessage');
@@ -725,11 +888,17 @@
         const editIdInput = document.getElementById('editId');
         const editAuthorInput = document.getElementById('editAuthor');
         const editAuthorDisplayInput = document.getElementById('editAuthorDisplay');
-        const editCategoryInput = document.getElementById('editCategory');
+        const editDepartmentInput = document.getElementById('editDepartment');
         const editTimeInput = document.getElementById('editTime');
         const editTitleInput = document.getElementById('editTitle');
         const editDateInput = document.getElementById('editDate');
         const editDescriptionInput = document.getElementById('editDescription');
+        const createAnnouncementBtn = document.getElementById('createAnnouncementBtn');
+        const currentDepartmentTitle = document.getElementById('currentDepartmentTitle');
+        const formSectionTitle = document.getElementById('formSectionTitle');
+        const selectedDepartmentInput = document.getElementById('selectedDepartment');
+        const otherDepartmentInput = document.getElementById('otherDepartment');
+        const goToOtherDepartmentBtn = document.getElementById('goToOtherDepartment');
 
         // Inicializar la aplicación
         function initApp() {
@@ -767,11 +936,11 @@
                 updateLoginUI();
             }
             
-            // Renderizar anuncios iniciales
-            renderAnnouncements();
-            
             // Configurar event listeners
             setupEventListeners();
+            
+            // Mostrar vista inicial
+            showView('departmentSelection');
         }
 
         // Configurar event listeners
@@ -801,11 +970,16 @@
             // Cerrar sesión
             logoutBtn.addEventListener('click', handleLogout);
             
-            // Enviar formulario de anuncio
-            announcementForm.addEventListener('submit', handleAnnouncementSubmit);
+            // Botón de volver
+            backBtn.addEventListener('click', goBackToDepartments);
             
-            // Filtrar anuncios por categoría
-            filterCategory.addEventListener('change', renderAnnouncements);
+            // Enviar formulario de anuncio
+            document.getElementById('announcementForm').addEventListener('submit', handleAnnouncementSubmit);
+            
+            // Botón para crear anuncio
+            createAnnouncementBtn.addEventListener('click', () => {
+                showView('form');
+            });
             
             // Cerrar panel de edición
             closeEditBtn.addEventListener('click', closeEditPanel);
@@ -818,6 +992,32 @@
             editPanel.addEventListener('click', (e) => {
                 if (e.target === editPanel) {
                     closeEditPanel();
+                }
+            });
+            
+            // Seleccionar departamento
+            document.querySelectorAll('.department-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const department = card.getAttribute('data-department');
+                    selectDepartment(department);
+                });
+            });
+            
+            // Ir a departamento personalizado
+            goToOtherDepartmentBtn.addEventListener('click', () => {
+                const department = otherDepartmentInput.value.trim();
+                if (department) {
+                    selectDepartment(department);
+                } else {
+                    showMessage('Por favor escribe el nombre de un departamento.', 'error');
+                }
+            });
+            
+            // También permitir Enter en el campo de departamento personalizado
+            otherDepartmentInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    goToOtherDepartmentBtn.click();
                 }
             });
         }
@@ -836,8 +1036,12 @@
                 usernameInput.value = '';
                 passwordInput.value = '';
                 
-                // Actualizar la visualización
-                renderAnnouncements();
+                // Actualizar la visualización si estamos viendo anuncios
+                if (currentView === 'announcements') {
+                    renderAnnouncements();
+                }
+                
+                // Mostrar panel de admin
                 renderAdminAnnouncements();
             } else {
                 showMessage('Credenciales incorrectas. Intenta nuevamente.', 'error');
@@ -851,8 +1055,10 @@
             updateLoginUI();
             showMessage('Sesión de administrador cerrada.', 'success');
             
-            // Actualizar la visualización
-            renderAnnouncements();
+            // Actualizar la visualización si estamos viendo anuncios
+            if (currentView === 'announcements') {
+                renderAnnouncements();
+            }
         }
 
         // Actualizar la UI según el estado de login
@@ -868,12 +1074,55 @@
             }
         }
 
+        // Seleccionar un departamento
+        function selectDepartment(department) {
+            currentDepartment = department;
+            currentDepartmentTitle.textContent = `Anuncios del Departamento: ${department}`;
+            selectedDepartmentInput.value = department;
+            
+            // Limpiar campo de departamento personalizado
+            otherDepartmentInput.value = '';
+            
+            // Mostrar vista de anuncios
+            showView('announcements');
+            renderAnnouncements();
+        }
+
+        // Volver a la selección de departamentos
+        function goBackToDepartments() {
+            currentDepartment = null;
+            showView('departmentSelection');
+        }
+
+        // Mostrar diferentes vistas
+        function showView(view) {
+            currentView = view;
+            
+            // Ocultar todas las vistas primero
+            departmentSelection.style.display = 'none';
+            announcementFormSection.classList.remove('active');
+            announcementsSection.classList.remove('active');
+            backBtn.style.display = 'none';
+            
+            // Mostrar la vista correspondiente
+            if (view === 'departmentSelection') {
+                departmentSelection.style.display = 'block';
+            } else if (view === 'form') {
+                announcementFormSection.classList.add('active');
+                backBtn.style.display = 'block';
+                formSectionTitle.textContent = `Crear Anuncio para: ${currentDepartment}`;
+            } else if (view === 'announcements') {
+                announcementsSection.classList.add('active');
+                backBtn.style.display = 'block';
+            }
+        }
+
         // Manejar envío de nuevo anuncio
         function handleAnnouncementSubmit(e) {
             e.preventDefault();
             
             // Obtener valores del formulario
-            const category = document.getElementById('category').value;
+            const department = selectedDepartmentInput.value;
             const time = document.getElementById('time').value;
             const title = document.getElementById('title').value.trim();
             const description = document.getElementById('description').value.trim();
@@ -881,7 +1130,7 @@
             const author = document.getElementById('author').value.trim();
             
             // Validar campos
-            if (!category || !time || !title || !description || !date || !author) {
+            if (!time || !title || !description || !date || !author) {
                 showMessage('Por favor completa todos los campos.', 'error');
                 return;
             }
@@ -889,13 +1138,13 @@
             // Crear nuevo anuncio
             const newAnnouncement = {
                 id: nextId++,
-                category,
+                department,
                 time,
                 title,
                 description,
                 date: date,
                 author: author,
-                authorId: currentUser // Guardar el ID del usuario que creó el anuncio
+                authorId: currentUser
             };
             
             // Agregar al array de anuncios
@@ -905,15 +1154,17 @@
             saveAnnouncements();
             
             // Limpiar formulario (excepto el nombre del autor)
-            document.getElementById('category').value = '';
             document.getElementById('time').value = '';
             document.getElementById('title').value = '';
             document.getElementById('date').value = '';
             document.getElementById('description').value = '';
-            // El campo de autor se mantiene para facilitar la creación de múltiples anuncios
+            // El campo de autor se mantiene
             
             // Mostrar mensaje de éxito
             showMessage('Anuncio publicado exitosamente.', 'success');
+            
+            // Volver a la vista de anuncios
+            showView('announcements');
             
             // Actualizar la visualización
             renderAnnouncements();
@@ -930,7 +1181,6 @@
             
             // Obtener valores del formulario
             const id = parseInt(editIdInput.value);
-            const category = editCategoryInput.value;
             const time = editTimeInput.value;
             const title = editTitleInput.value.trim();
             const description = editDescriptionInput.value.trim();
@@ -938,7 +1188,7 @@
             const author = editAuthorInput.value;
             
             // Validar campos
-            if (!category || !time || !title || !description || !date) {
+            if (!time || !title || !description || !date) {
                 showMessage('Por favor completa todos los campos.', 'error');
                 return;
             }
@@ -958,12 +1208,11 @@
                 // Actualizar el anuncio
                 announcements[index] = {
                     ...announcement,
-                    category,
                     time,
                     title,
                     description,
                     date
-                    // El autor y authorId se mantienen
+                    // El autor, authorId y departamento se mantienen
                 };
                 
                 // Guardar en localStorage
@@ -997,7 +1246,7 @@
                 editIdInput.value = announcement.id;
                 editAuthorInput.value = announcement.author;
                 editAuthorDisplayInput.value = announcement.author;
-                editCategoryInput.value = announcement.category;
+                editDepartmentInput.value = announcement.department;
                 editTimeInput.value = announcement.time;
                 editTitleInput.value = announcement.title;
                 editDateInput.value = announcement.date;
@@ -1052,18 +1301,15 @@
             localStorage.setItem('churchAnnouncements', JSON.stringify(announcements));
         }
 
-        // Renderizar anuncios según la categoría seleccionada
+        // Renderizar anuncios del departamento actual
         function renderAnnouncements() {
-            const selectedCategory = filterCategory.value;
+            if (!currentDepartment) return;
             
-            // Filtrar anuncios según la categoría seleccionada
-            let filteredAnnouncements = announcements;
-            if (selectedCategory !== 'all') {
-                filteredAnnouncements = announcements.filter(ann => ann.category === selectedCategory);
-            }
+            // Filtrar anuncios del departamento actual
+            const departmentAnnouncements = announcements.filter(ann => ann.department === currentDepartment);
             
             // Mostrar mensaje si no hay anuncios
-            if (filteredAnnouncements.length === 0) {
+            if (departmentAnnouncements.length === 0) {
                 emptyMessage.style.display = 'block';
                 announcementsContainer.innerHTML = '';
                 announcementsContainer.appendChild(emptyMessage);
@@ -1077,7 +1323,7 @@
             let announcementsHTML = '';
             
             // Ordenar por fecha (más cercana primero)
-            const sortedAnnouncements = [...filteredAnnouncements].sort((a, b) => {
+            const sortedAnnouncements = [...departmentAnnouncements].sort((a, b) => {
                 return new Date(a.date) - new Date(b.date);
             });
             
@@ -1098,7 +1344,7 @@
                         </div>
                         ` : ''}
                         <h3>${announcement.title}</h3>
-                        <div class="announcement-category">${announcement.category}</div>
+                        <div class="announcement-category">${announcement.department}</div>
                         <div class="announcement-meta">
                             <span><strong>Hora:</strong> ${announcement.time}</span>
                             <span><strong>Fecha:</strong> ${announcement.date}</span>
@@ -1133,9 +1379,12 @@
             // Generar HTML de los anuncios
             let adminAnnouncementsHTML = '';
             
-            // Ordenar por fecha (más cercana primero)
+            // Ordenar por departamento y fecha
             const sortedAnnouncements = [...announcements].sort((a, b) => {
-                return new Date(a.date) - new Date(b.date);
+                if (a.department === b.department) {
+                    return new Date(a.date) - new Date(b.date);
+                }
+                return a.department.localeCompare(b.department);
             });
             
             sortedAnnouncements.forEach(announcement => {
@@ -1150,18 +1399,16 @@
                             </button>
                         </div>
                         <h3>${announcement.title}</h3>
-                        <div class="announcement-category">${announcement.category}</div>
+                        <div class="announcement-category">${announcement.department}</div>
                         <div class="announcement-meta">
                             <span><strong>Hora:</strong> ${announcement.time}</span>
                             <span><strong>Fecha:</strong> ${announcement.date}</span>
-                            <span><strong>ID:</strong> ${announcement.id}</span>
                         </div>
                         <div class="announcement-description">
                             ${announcement.description}
                         </div>
                         <div class="announcement-author">
-                            <strong>Publicado por:</strong> ${announcement.author} 
-                            <span style="font-size: 0.8rem; color: #666;">(ID: ${announcement.authorId})</span>
+                            <strong>Publicado por:</strong> ${announcement.author}
                         </div>
                     </div>
                 `;
