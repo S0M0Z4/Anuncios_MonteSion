@@ -773,6 +773,51 @@
             border: 1px solid #fecaca;
         }
         
+        /* Modal de éxito */
+        .success-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .success-modal.active {
+            display: flex;
+        }
+        
+        .success-modal-content {
+            background-color: var(--blanco);
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--sombra);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .success-icon {
+            font-size: 3rem;
+            color: var(--verde);
+            margin-bottom: 1rem;
+        }
+        
+        .success-modal-content h3 {
+            color: var(--azul-principal);
+            margin-bottom: 1rem;
+        }
+        
+        .success-modal-content p {
+            margin-bottom: 1.5rem;
+            color: var(--gris-oscuro);
+        }
+        
         /* Responsive mejorado para teléfonos */
         @media (max-width: 768px) {
             .header {
@@ -913,6 +958,15 @@
             .cloud-info {
                 font-size: 0.8rem;
                 padding: 0.6rem;
+            }
+            
+            .success-modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .success-icon {
+                font-size: 2.5rem;
             }
         }
         
@@ -1370,6 +1424,16 @@
         </div>
     </div>
 
+    <!-- Modal de éxito -->
+    <div id="successModal" class="success-modal">
+        <div class="success-modal-content">
+            <div class="success-icon" id="successIcon">✓</div>
+            <h3 id="successTitle">¡Operación Exitosa!</h3>
+            <p id="successMessage">La operación se completó correctamente.</p>
+            <button id="closeSuccessModal" class="submit-btn">Aceptar</button>
+        </div>
+    </div>
+
     <!-- Estado de conexión -->
     <div id="connectionStatus" class="connection-status">
         <span id="connectionStatusText">Conectando...</span>
@@ -1389,6 +1453,7 @@
         let currentDepartment = null;
         let deviceId = null;
         let lastView = 'departmentSelection'; // Para manejar navegación
+        let isProcessing = false; // Para evitar múltiples operaciones simultáneas
 
         // Elementos del DOM
         const loginBtn = document.getElementById('loginBtn');
@@ -1415,6 +1480,11 @@
         const syncStatusText = document.getElementById('syncStatusText');
         const connectionStatus = document.getElementById('connectionStatus');
         const connectionStatusText = document.getElementById('connectionStatusText');
+        const successModal = document.getElementById('successModal');
+        const successTitle = document.getElementById('successTitle');
+        const successMessage = document.getElementById('successMessage');
+        const successIcon = document.getElementById('successIcon');
+        const closeSuccessModal = document.getElementById('closeSuccessModal');
 
         // Inicializar la aplicación
         function initApp() {
@@ -1502,19 +1572,14 @@
                         syncStatus.className = 'message success';
                         updateConnectionStatus(true);
                         
-                        // Si estamos en vista de anuncios, actualizar
-                        if (announcementsSection.classList.contains('active')) {
-                            renderAnnouncements();
-                        }
+                        // Actualizar las vistas si están activas
+                        updateAllViews();
                         
-                        // Si estamos en vista de admin, actualizar
-                        if (adminPanel.classList.contains('active')) {
-                            renderAdminAnnouncements();
-                        }
                     } else {
                         announcements = [];
                         syncStatusText.textContent = '✅ Base de datos vacía';
                         syncStatus.className = 'message info';
+                        updateAllViews();
                     }
                 }, (error) => {
                     console.error("Error cargando datos de Firebase:", error);
@@ -1528,6 +1593,19 @@
                 syncStatusText.textContent = '⚠️ Error crítico de conexión';
                 syncStatus.className = 'message error';
                 updateConnectionStatus(false);
+            }
+        }
+
+        // Actualizar todas las vistas activas
+        function updateAllViews() {
+            // Si estamos en vista de anuncios, actualizar
+            if (announcementsSection.classList.contains('active')) {
+                renderAnnouncements();
+            }
+            
+            // Si estamos en vista de admin, actualizar
+            if (adminPanel.classList.contains('active')) {
+                renderAdminAnnouncements();
             }
         }
 
@@ -1571,6 +1649,14 @@
                 console.error("Error eliminando de Firebase:", error);
                 return false;
             }
+        }
+
+        // Mostrar modal de éxito
+        function showSuccessModal(title, message, icon = "✓") {
+            successTitle.textContent = title;
+            successMessage.textContent = message;
+            successIcon.textContent = icon;
+            successModal.classList.add('active');
         }
 
         // Configurar event listeners
@@ -1618,11 +1704,11 @@
             refreshCloudBtn.addEventListener('click', () => {
                 syncStatusText.textContent = 'Actualizando datos...';
                 syncStatus.className = 'message info';
+                // Simular recarga forzando una nueva lectura
+                loadAnnouncementsFromFirebase();
                 setTimeout(() => {
-                    syncStatusText.textContent = `✅ Sincronizado con la nube (${announcements.length} anuncios)`;
-                    syncStatus.className = 'message success';
-                    showMessage('Datos actualizados correctamente.', 'success');
-                }, 500);
+                    showSuccessModal('¡Datos Actualizados!', 'Los anuncios se han actualizado correctamente.', '🔄');
+                }, 300);
             });
             
             // Botones de navegación
@@ -1660,6 +1746,18 @@
             document.getElementById('editPanel').addEventListener('click', (e) => {
                 if (e.target === document.getElementById('editPanel')) {
                     closeEditPanel();
+                }
+            });
+            
+            // Cerrar modal de éxito
+            closeSuccessModal.addEventListener('click', () => {
+                successModal.classList.remove('active');
+            });
+            
+            // Cerrar modal de éxito al hacer clic fuera
+            successModal.addEventListener('click', (e) => {
+                if (e.target === successModal) {
+                    successModal.classList.remove('active');
                 }
             });
             
@@ -1733,7 +1831,7 @@
                 isAdminLoggedIn = true;
                 localStorage.setItem('adminSession', 'active');
                 updateLoginUI();
-                showMessage('Sesión de administrador iniciada correctamente.', 'success');
+                showSuccessModal('¡Sesión Iniciada!', 'Sesión de administrador iniciada correctamente.', '🔐');
                 loginForm.classList.remove('active');
                 usernameInput.value = '';
                 passwordInput.value = '';
@@ -1747,7 +1845,7 @@
             isAdminLoggedIn = false;
             localStorage.removeItem('adminSession');
             updateLoginUI();
-            showMessage('Sesión de administrador cerrada.', 'success');
+            showSuccessModal('¡Sesión Cerrada!', 'Sesión de administrador cerrada correctamente.', '🚪');
             
             // Volver a vista de departamentos
             showView('departmentSelection');
@@ -1841,6 +1939,9 @@
         async function handleAnnouncementSubmit(e) {
             e.preventDefault();
             
+            if (isProcessing) return;
+            isProcessing = true;
+            
             // Obtener valores del formulario
             const department = document.getElementById('selectedDepartment').value;
             const time = document.getElementById('time').value;
@@ -1852,6 +1953,7 @@
             // Validar campos
             if (!time || !title || !description || !date || !author) {
                 showMessage('Por favor completa todos los campos.', 'error');
+                isProcessing = false;
                 return;
             }
             
@@ -1882,6 +1984,7 @@
             document.getElementById('submitBtnText').textContent = 'Publicar Anuncio';
             document.getElementById('submitLoading').style.display = 'none';
             document.getElementById('submitAnnouncementBtn').disabled = false;
+            isProcessing = false;
             
             if (firebaseSuccess) {
                 // Limpiar formulario (excepto el nombre del autor)
@@ -1891,11 +1994,22 @@
                 document.getElementById('description').value = '';
                 // El campo de autor se mantiene
                 
-                // Mostrar mensaje de éxito
-                showMessage('¡Anuncio publicado exitosamente en la nube! El administrador puede verlo desde cualquier dispositivo.', 'success');
+                // Mostrar modal de éxito
+                showSuccessModal(
+                    '¡Anuncio Publicado!', 
+                    'Tu anuncio se ha publicado exitosamente en la nube. El administrador puede verlo desde cualquier dispositivo.',
+                    '📢'
+                );
                 
-                // Volver a la vista de anuncios
-                showView('announcements');
+                // Forzar recarga de datos después de 1.5 segundos
+                setTimeout(() => {
+                    // Recargar datos desde Firebase
+                    loadAnnouncementsFromFirebase();
+                    
+                    // Volver a la vista de anuncios
+                    showView('announcements');
+                }, 1500);
+                
             } else {
                 showMessage('Error al publicar el anuncio. Intenta nuevamente.', 'error');
             }
@@ -1904,6 +2018,9 @@
         // Manejar edición de anuncio
         async function handleEditAnnouncement(e) {
             e.preventDefault();
+            
+            if (isProcessing) return;
+            isProcessing = true;
             
             // Obtener valores del formulario
             const id = parseInt(document.getElementById('editId').value);
@@ -1916,6 +2033,7 @@
             // Validar campos
             if (!time || !title || !description || !date || !author) {
                 showMessage('Por favor completa todos los campos.', 'error');
+                isProcessing = false;
                 return;
             }
             
@@ -1946,16 +2064,34 @@
                 document.getElementById('saveEditText').textContent = 'Guardar Cambios';
                 document.getElementById('saveEditLoading').style.display = 'none';
                 document.getElementById('saveEditBtn').disabled = false;
+                isProcessing = false;
                 
                 if (firebaseSuccess) {
                     // Cerrar panel de edición
                     closeEditPanel();
                     
-                    // Mostrar mensaje de éxito
-                    showMessage('Anuncio actualizado exitosamente en la nube.', 'success');
+                    // Mostrar modal de éxito
+                    showSuccessModal(
+                        '¡Anuncio Actualizado!', 
+                        'El anuncio se ha actualizado exitosamente en la nube.',
+                        '✏️'
+                    );
+                    
+                    // Forzar recarga de datos después de 1.5 segundos
+                    setTimeout(() => {
+                        // Recargar datos desde Firebase
+                        loadAnnouncementsFromFirebase();
+                    }, 1500);
+                    
                 } else {
                     showMessage('Error al actualizar el anuncio. Intenta nuevamente.', 'error');
                 }
+            } else {
+                document.getElementById('saveEditText').textContent = 'Guardar Cambios';
+                document.getElementById('saveEditLoading').style.display = 'none';
+                document.getElementById('saveEditBtn').disabled = false;
+                isProcessing = false;
+                showMessage('El anuncio no se encontró.', 'error');
             }
         }
 
@@ -1992,16 +2128,30 @@
 
         // Eliminar un anuncio
         async function deleteAnnouncement(id) {
+            if (isProcessing) return;
+            
             if (confirm('¿Estás seguro de que quieres eliminar este anuncio?')) {
+                isProcessing = true;
+                
                 // Intentar eliminar de Firebase
                 const firebaseSuccess = await deleteAnnouncementFromFirebase(id);
                 
+                isProcessing = false;
+                
                 if (firebaseSuccess) {
-                    // Mostrar mensaje
-                    showMessage('Anuncio eliminado exitosamente de la nube.', 'success');
+                    // Mostrar modal de éxito
+                    showSuccessModal(
+                        '¡Anuncio Eliminado!', 
+                        'El anuncio se ha eliminado exitosamente de la nube.',
+                        '🗑️'
+                    );
                     
-                    // NOTA: No necesitamos hacer nada más porque Firebase en tiempo real
-                    // actualizará automáticamente la lista de anuncios
+                    // Forzar recarga de datos después de 1.5 segundos
+                    setTimeout(() => {
+                        // Recargar datos desde Firebase
+                        loadAnnouncementsFromFirebase();
+                    }, 1500);
+                    
                 } else {
                     showMessage('Error al eliminar el anuncio. Intenta nuevamente.', 'error');
                 }
