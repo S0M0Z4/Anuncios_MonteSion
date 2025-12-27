@@ -545,6 +545,55 @@
             gap: 1.2rem;
         }
         
+        /* Panel de edición de anuncios (oculto por defecto) */
+        .edit-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .edit-panel.active {
+            display: flex;
+        }
+        
+        .edit-form {
+            background-color: var(--blanco);
+            width: 90%;
+            max-width: 600px;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--sombra);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+        
+        .edit-header h3 {
+            color: var(--azul-principal);
+            font-size: 1.2rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gris-oscuro);
+        }
+        
         /* Mensajes */
         .message {
             padding: 0.8rem;
@@ -582,6 +631,17 @@
             padding: 1.5rem;
             color: var(--gris);
             font-size: 0.95rem;
+        }
+        
+        /* Información de sincronización */
+        .sync-info {
+            background-color: var(--azul-claro);
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--azul-principal);
+            text-align: center;
         }
         
         /* Responsive para teléfonos */
@@ -870,6 +930,11 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Información de sincronización -->
+            <div class="sync-info">
+                ℹ️ Los anuncios se guardan localmente en cada dispositivo. El administrador puede ver todos los anuncios.
+            </div>
         </section>
 
         <!-- Sección de formulario de anuncios -->
@@ -932,7 +997,7 @@
         </section>
     </main>
 
-    <!-- Panel de edición de anuncios -->
+    <!-- Panel de edición de anuncios (OCULTO POR DEFECTO) -->
     <div id="editPanel" class="edit-panel">
         <div class="edit-form">
             <div class="edit-header">
@@ -989,7 +1054,8 @@
                 date: "2023-11-15",
                 author: "Director Juan",
                 authorId: "director_juan",
-                createdAt: "2023-10-10T10:00:00"
+                createdAt: "2023-10-10T10:00:00",
+                deviceId: "web_demo"
             },
             {
                 id: 2,
@@ -1001,7 +1067,8 @@
                 date: "2023-11-20",
                 author: "Profesor Pedro",
                 authorId: "profesor_pedro",
-                createdAt: "2023-10-11T14:30:00"
+                createdAt: "2023-10-11T14:30:00",
+                deviceId: "web_demo"
             },
             {
                 id: 3,
@@ -1013,7 +1080,8 @@
                 date: "2023-11-18",
                 author: "Hermana María",
                 authorId: "maria_hermana",
-                createdAt: "2023-10-12T09:15:00"
+                createdAt: "2023-10-12T09:15:00",
+                deviceId: "web_demo"
             },
             {
                 id: 4,
@@ -1025,7 +1093,8 @@
                 date: "2023-11-22",
                 author: "Directora Ana",
                 authorId: "ana_directora",
-                createdAt: "2023-10-13T16:45:00"
+                createdAt: "2023-10-13T16:45:00",
+                deviceId: "web_demo"
             }
         ];
 
@@ -1045,6 +1114,7 @@
         let currentDepartment = null;
         let currentView = 'departmentSelection'; // 'departmentSelection', 'announcements', 'form', 'admin'
         let currentSubdepartment = null;
+        let deviceId = null;
 
         // Elementos del DOM
         const loginBtn = document.getElementById('loginBtn');
@@ -1091,6 +1161,14 @@
             document.getElementById('date').min = today;
             document.getElementById('editDate').min = today;
             
+            // Generar un ID único para el dispositivo
+            if (!localStorage.getItem('deviceId')) {
+                deviceId = 'device_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+                localStorage.setItem('deviceId', deviceId);
+            } else {
+                deviceId = localStorage.getItem('deviceId');
+            }
+            
             // Generar un ID único para el usuario actual (si no existe)
             if (!localStorage.getItem('currentUserId')) {
                 const userId = 'user_' + Math.random().toString(36).substr(2, 9);
@@ -1099,19 +1177,8 @@
             
             currentUser = localStorage.getItem('currentUserId');
             
-            // Cargar anuncios desde localStorage o usar datos iniciales
-            const savedAnnouncements = localStorage.getItem('churchAnnouncements');
-            
-            if (savedAnnouncements) {
-                announcements = JSON.parse(savedAnnouncements);
-                // Encontrar el ID más alto para continuar la numeración
-                if (announcements.length > 0) {
-                    nextId = Math.max(...announcements.map(ann => ann.id)) + 1;
-                }
-            } else {
-                announcements = initialAnnouncements;
-                saveAnnouncements();
-            }
+            // Cargar anuncios desde localStorage
+            loadAnnouncements();
             
             // Verificar si hay sesión de administrador activa
             const adminSession = localStorage.getItem('adminSession');
@@ -1127,6 +1194,29 @@
             
             // Mostrar vista inicial
             showView('departmentSelection');
+        }
+
+        // Cargar anuncios desde localStorage
+        function loadAnnouncements() {
+            const savedAnnouncements = localStorage.getItem('churchAnnouncements');
+            
+            if (savedAnnouncements) {
+                announcements = JSON.parse(savedAnnouncements);
+                // Encontrar el ID más alto para continuar la numeración
+                if (announcements.length > 0) {
+                    nextId = Math.max(...announcements.map(ann => ann.id)) + 1;
+                }
+            } else {
+                announcements = initialAnnouncements;
+                saveAnnouncements();
+            }
+            
+            // Asegurarse de que cada anuncio tenga un deviceId
+            announcements.forEach(announcement => {
+                if (!announcement.deviceId) {
+                    announcement.deviceId = 'web_demo';
+                }
+            });
         }
 
         // Configurar event listeners
@@ -1378,6 +1468,7 @@
                 date: date,
                 author: author,
                 authorId: currentUser,
+                deviceId: deviceId,
                 createdAt: new Date().toISOString()
             };
             
@@ -1445,8 +1536,8 @@
                     time,
                     title,
                     description,
-                    date
-                    // El autor, authorId y departamento se mantienen
+                    date,
+                    // El autor, authorId, departamento y deviceId se mantienen
                 };
                 
                 // Guardar en localStorage
@@ -1543,7 +1634,12 @@
             if (!currentDepartment) return;
             
             // Filtrar anuncios del departamento actual
-            const departmentAnnouncements = announcements.filter(ann => ann.department === currentDepartment);
+            let departmentAnnouncements = announcements.filter(ann => ann.department === currentDepartment);
+            
+            // Si NO es admin, mostrar solo los anuncios del usuario actual
+            if (!isAdminLoggedIn) {
+                departmentAnnouncements = departmentAnnouncements.filter(ann => ann.authorId === currentUser);
+            }
             
             // Mostrar mensaje si no hay anuncios
             if (departmentAnnouncements.length === 0) {
@@ -1592,6 +1688,7 @@
                         <div class="announcement-author">
                             <strong>Publicado por:</strong> ${announcement.author}
                             ${isMine ? ' <em>(Tú)</em>' : ''}
+                            ${isAdminLoggedIn ? ` <span style="font-size: 0.7rem; color: #666;">(Dispositivo: ${announcement.deviceId?.substring(0, 8)}...)</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -1625,8 +1722,11 @@
             });
             
             sortedAnnouncements.forEach(announcement => {
+                const isMine = announcement.authorId === currentUser;
+                const canEdit = isMine || isAdminLoggedIn;
+                
                 adminAnnouncementsHTML += `
-                    <div class="announcement-card ${announcement.authorId === currentUser ? 'mine' : ''}">
+                    <div class="announcement-card ${isMine ? 'mine' : ''}">
                         <div class="announcement-actions">
                             <button class="action-btn edit-btn" onclick="openEditPanel(${announcement.id})">
                                 ✏️
@@ -1640,12 +1740,17 @@
                         <div class="announcement-meta">
                             <span><strong>Hora:</strong> ${announcement.time}</span>
                             <span><strong>Fecha:</strong> ${announcement.date}</span>
+                            <span><strong>ID:</strong> ${announcement.id}</span>
                         </div>
                         <div class="announcement-description">
                             ${announcement.description}
                         </div>
                         <div class="announcement-author">
                             <strong>Publicado por:</strong> ${announcement.author}
+                            <span style="font-size: 0.7rem; color: #666;">
+                                (Usuario: ${announcement.authorId?.substring(0, 8)}... | 
+                                Dispositivo: ${announcement.deviceId?.substring(0, 8)}...)
+                            </span>
                         </div>
                     </div>
                 `;
