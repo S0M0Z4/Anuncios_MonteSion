@@ -670,6 +670,13 @@
             display: block;
         }
         
+        .message.warning {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+            display: block;
+        }
+        
         .empty-message {
             grid-column: 1 / -1;
             text-align: center;
@@ -739,6 +746,31 @@
             font-size: 1.3rem;
             flex-grow: 1;
             text-align: center;
+        }
+        
+        /* Estado de conexión */
+        .connection-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            z-index: 1000;
+            background-color: white;
+            box-shadow: var(--sombra);
+        }
+        
+        .connection-status.online {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .connection-status.offline {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
         }
         
         /* Responsive para teléfonos */
@@ -821,6 +853,13 @@
                 padding: 0 0.8rem;
                 margin: 1rem auto;
             }
+            
+            .connection-status {
+                bottom: 5px;
+                right: 5px;
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -846,6 +885,10 @@
             }
         }
     </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js"></script>
 </head>
 <body>
     <!-- Encabezado con login -->
@@ -885,6 +928,9 @@
             <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
                 <strong>IMPORTANTE:</strong> Los anuncios se guardan en la nube y pueden ser vistos por el administrador desde cualquier dispositivo
             </p>
+            <div id="syncStatus" class="message info" style="margin-top: 1rem; display: none;">
+                <span id="syncStatusText">Conectando con la base de datos...</span>
+            </div>
         </div>
 
         <!-- Pantalla de selección de departamento principal -->
@@ -1105,10 +1151,10 @@
                 <h4>¿Cómo funciona?</h4>
                 <ul>
                     <li>Completa todos los campos del formulario</li>
-                    <li>Haz clic en "Publicar Anuncio" para guardar tu anuncio</li>
-                    <li>Tu anuncio se guardará automáticamente en la nube</li>
+                    <li>Haz clic en "Publicar Anuncio" para guardar tu anuncio en la nube</li>
+                    <li>Tu anuncio se sincronizará automáticamente con todos los dispositivos</li>
                     <li>El administrador podrá ver tu anuncio desde cualquier dispositivo</li>
-                    <li>Si quieres editar o eliminar tu anuncio, el administrador puede hacerlo desde la vista de administrador</li>
+                    <li>El administrador puede editar o eliminar anuncios desde la vista de administrador</li>
                 </ul>
             </div>
         </section>
@@ -1197,34 +1243,34 @@
         </div>
     </div>
 
+    <!-- Estado de conexión -->
+    <div id="connectionStatus" class="connection-status">
+        <span id="connectionStatusText">Conectando...</span>
+    </div>
+
     <script>
-        // Datos de ejemplo para inicializar la aplicación
-        const initialAnnouncements = [
-            {
-                id: 1,
-                department: "JA",
-                time: "18:00",
-                title: "Retiro Espiritual JA",
-                description: "Retiro para jóvenes adventistas en la montaña. Traer Biblia y ropa abrigadora.",
-                date: "2023-11-15",
-                author: "Director Juan",
-                authorId: "director_juan",
-                createdAt: "2023-10-10T10:00:00",
-                deviceId: "web_demo"
-            },
-            {
-                id: 2,
-                department: "Conquistadores",
-                time: "09:30",
-                title: "Acampada de Fin de Semana",
-                description: "Acampada para conquistadores en el campamento central.",
-                date: "2023-11-20",
-                author: "Profesor Pedro",
-                authorId: "profesor_pedro",
-                createdAt: "2023-10-11T14:30:00",
-                deviceId: "web_demo"
-            }
-        ];
+        // Configuración de Firebase - ¡REEMPLAZA ESTOS VALORES CON LOS DE TU PROYECTO FIREBASE!
+        const firebaseConfig = {
+            apiKey: "AIzaSyDexample1234567890abcdefghijklmnopq",
+            authDomain: "tu-proyecto.firebaseapp.com",
+            databaseURL: "https://tu-proyecto-default-rtdb.firebaseio.com",
+            projectId: "tu-proyecto",
+            storageBucket: "tu-proyecto.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890abcdef"
+        };
+
+        // Inicializar Firebase
+        let database;
+        try {
+            const app = firebase.initializeApp(firebaseConfig);
+            database = firebase.database(app);
+            console.log("Firebase inicializado correctamente");
+            updateConnectionStatus(true);
+        } catch (error) {
+            console.error("Error inicializando Firebase:", error);
+            updateConnectionStatus(false);
+        }
 
         // Credenciales de administrador
         const ADMIN_CREDENTIALS = {
@@ -1235,7 +1281,6 @@
         // Estado de la aplicación
         let announcements = [];
         let isAdminLoggedIn = false;
-        let nextId = 3;
         let currentUser = null;
         let currentDepartment = null;
         let deviceId = null;
@@ -1254,7 +1299,6 @@
         const announcementFormSection = document.getElementById('announcementFormSection');
         const announcementsSection = document.getElementById('announcementsSection');
         const adminPanel = document.getElementById('adminPanel');
-        const backBtn = document.getElementById('backBtn');
         const backToDepartmentsBtn = document.getElementById('backToDepartmentsBtn');
         const backToJuvenilBtn = document.getElementById('backToJuvenilBtn');
         const backToSelectionBtn = document.getElementById('backToSelectionBtn');
@@ -1262,6 +1306,10 @@
         const backToMainFromAdminBtn = document.getElementById('backToMainFromAdminBtn');
         const createAnnouncementBtn = document.getElementById('createAnnouncementBtn');
         const refreshCloudBtn = document.getElementById('refreshCloudBtn');
+        const syncStatus = document.getElementById('syncStatus');
+        const syncStatusText = document.getElementById('syncStatusText');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const connectionStatusText = document.getElementById('connectionStatusText');
 
         // Inicializar la aplicación
         function initApp() {
@@ -1286,8 +1334,12 @@
             
             currentUser = localStorage.getItem('currentUserId');
             
-            // Cargar anuncios desde almacenamiento local
-            loadAnnouncementsFromLocal();
+            // Mostrar estado de conexión
+            syncStatus.style.display = 'block';
+            syncStatusText.textContent = 'Conectando con la base de datos...';
+            
+            // Cargar anuncios desde Firebase
+            loadAnnouncementsFromFirebase();
             
             // Verificar si hay sesión de administrador activa
             const adminSession = localStorage.getItem('adminSession');
@@ -1303,32 +1355,115 @@
             showView('departmentSelection');
         }
 
-        // Cargar anuncios desde almacenamiento local
-        function loadAnnouncementsFromLocal() {
-            const savedAnnouncements = localStorage.getItem('churchAnnouncements');
-            
-            if (savedAnnouncements) {
-                announcements = JSON.parse(savedAnnouncements);
-                // Encontrar el ID más alto para continuar la numeración
-                if (announcements.length > 0) {
-                    nextId = Math.max(...announcements.map(ann => ann.id)) + 1;
-                }
+        // Actualizar estado de conexión
+        function updateConnectionStatus(connected) {
+            if (connected) {
+                connectionStatus.className = 'connection-status online';
+                connectionStatusText.textContent = '✅ Conectado a la nube';
             } else {
-                announcements = initialAnnouncements;
-                saveAnnouncementsToLocal();
+                connectionStatus.className = 'connection-status offline';
+                connectionStatusText.textContent = '⚠️ Sin conexión a la nube';
             }
-            
-            // Asegurarse de que cada anuncio tenga un deviceId
-            announcements.forEach(announcement => {
-                if (!announcement.deviceId) {
-                    announcement.deviceId = 'web_demo';
-                }
-            });
         }
 
-        // Guardar anuncios en almacenamiento local
-        function saveAnnouncementsToLocal() {
-            localStorage.setItem('churchAnnouncements', JSON.stringify(announcements));
+        // Cargar anuncios desde Firebase
+        function loadAnnouncementsFromFirebase() {
+            if (!database) {
+                console.error("Firebase no está inicializado");
+                syncStatusText.textContent = 'Error: Firebase no inicializado';
+                syncStatus.className = 'message error';
+                return;
+            }
+            
+            try {
+                // Referencia a la base de datos
+                const announcementsRef = database.ref('announcements');
+                
+                // Escuchar cambios en tiempo real
+                announcementsRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    
+                    if (data) {
+                        // Convertir objeto a array
+                        announcements = Object.values(data);
+                        
+                        // Ordenar por ID (más reciente primero)
+                        announcements.sort((a, b) => b.id - a.id);
+                        
+                        console.log(`Cargados ${announcements.length} anuncios desde Firebase`);
+                        
+                        // Actualizar estado de sincronización
+                        syncStatusText.textContent = `✅ Sincronizado con la nube (${announcements.length} anuncios)`;
+                        syncStatus.className = 'message success';
+                        updateConnectionStatus(true);
+                        
+                        // Si estamos en vista de anuncios, actualizar
+                        if (announcementsSection.classList.contains('active')) {
+                            renderAnnouncements();
+                        }
+                        
+                        // Si estamos en vista de admin, actualizar
+                        if (adminPanel.classList.contains('active')) {
+                            renderAdminAnnouncements();
+                        }
+                    } else {
+                        announcements = [];
+                        syncStatusText.textContent = '✅ Base de datos vacía';
+                        syncStatus.className = 'message info';
+                    }
+                }, (error) => {
+                    console.error("Error cargando datos de Firebase:", error);
+                    syncStatusText.textContent = '⚠️ Error de conexión con la base de datos';
+                    syncStatus.className = 'message error';
+                    updateConnectionStatus(false);
+                });
+                
+            } catch (error) {
+                console.error("Error en loadAnnouncementsFromFirebase:", error);
+                syncStatusText.textContent = '⚠️ Error crítico de conexión';
+                syncStatus.className = 'message error';
+                updateConnectionStatus(false);
+            }
+        }
+
+        // Guardar anuncios en Firebase
+        async function saveAnnouncementToFirebase(announcement) {
+            if (!database) {
+                console.error("Firebase no está inicializado");
+                return false;
+            }
+            
+            try {
+                // Generar un ID único para el anuncio si no tiene
+                if (!announcement.id) {
+                    announcement.id = Date.now();
+                }
+                
+                // Guardar en Firebase
+                await database.ref('announcements/' + announcement.id).set(announcement);
+                console.log("Anuncio guardado en Firebase:", announcement.id);
+                return true;
+            } catch (error) {
+                console.error("Error guardando en Firebase:", error);
+                return false;
+            }
+        }
+
+        // Eliminar anuncio de Firebase
+        async function deleteAnnouncementFromFirebase(id) {
+            if (!database) {
+                console.error("Firebase no está inicializado");
+                return false;
+            }
+            
+            try {
+                await database.ref('announcements/' + id).remove();
+                console.log("Anuncio eliminado de Firebase:", id);
+                return true;
+            } catch (error) {
+                console.error("Error eliminando de Firebase:", error);
+                return false;
+            }
         }
 
         // Configurar event listeners
@@ -1368,7 +1503,7 @@
             
             // Botón para refrescar datos
             refreshCloudBtn.addEventListener('click', () => {
-                renderAdminAnnouncements();
+                loadAnnouncementsFromFirebase();
                 showMessage('Datos actualizados correctamente.', 'success');
             });
             
@@ -1552,7 +1687,7 @@
         }
 
         // Manejar envío de nuevo anuncio
-        function handleAnnouncementSubmit(e) {
+        async function handleAnnouncementSubmit(e) {
             e.preventDefault();
             
             // Obtener valores del formulario
@@ -1576,7 +1711,7 @@
             
             // Crear nuevo anuncio
             const newAnnouncement = {
-                id: nextId++,
+                id: Date.now(), // Usar timestamp como ID único
                 department,
                 time,
                 title,
@@ -1585,39 +1720,38 @@
                 author: author,
                 authorId: currentUser,
                 deviceId: deviceId,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
             };
             
-            // Agregar al array de anuncios
-            announcements.push(newAnnouncement);
-            
-            // Guardar localmente
-            saveAnnouncementsToLocal();
+            // Intentar guardar en Firebase
+            const firebaseSuccess = await saveAnnouncementToFirebase(newAnnouncement);
             
             // Restaurar botón
             document.getElementById('submitBtnText').textContent = 'Publicar Anuncio';
             document.getElementById('submitLoading').style.display = 'none';
             document.getElementById('submitAnnouncementBtn').disabled = false;
             
-            // Limpiar formulario (excepto el nombre del autor)
-            document.getElementById('time').value = '';
-            document.getElementById('title').value = '';
-            document.getElementById('date').value = '';
-            document.getElementById('description').value = '';
-            // El campo de autor se mantiene
-            
-            // Mostrar mensaje de éxito
-            showMessage('¡Anuncio publicado exitosamente! El administrador puede verlo desde cualquier dispositivo.', 'success');
-            
-            // Volver a la vista de anuncios
-            showView('announcements');
-            
-            // Actualizar la visualización
-            renderAnnouncements();
+            if (firebaseSuccess) {
+                // Limpiar formulario (excepto el nombre del autor)
+                document.getElementById('time').value = '';
+                document.getElementById('title').value = '';
+                document.getElementById('date').value = '';
+                document.getElementById('description').value = '';
+                // El campo de autor se mantiene
+                
+                // Mostrar mensaje de éxito
+                showMessage('¡Anuncio publicado exitosamente en la nube! El administrador puede verlo desde cualquier dispositivo.', 'success');
+                
+                // Volver a la vista de anuncios
+                showView('announcements');
+            } else {
+                showMessage('Error al publicar el anuncio. Intenta nuevamente.', 'error');
+            }
         }
 
         // Manejar edición de anuncio
-        function handleEditAnnouncement(e) {
+        async function handleEditAnnouncement(e) {
             e.preventDefault();
             
             // Obtener valores del formulario
@@ -1640,36 +1774,37 @@
             document.getElementById('saveEditBtn').disabled = true;
             
             // Buscar el anuncio a editar
-            const index = announcements.findIndex(ann => ann.id === id);
+            const announcement = announcements.find(ann => ann.id === id);
             
-            if (index !== -1) {
-                // Actualizar el anuncio
-                announcements[index] = {
-                    ...announcements[index],
+            if (announcement) {
+                // Crear anuncio actualizado
+                const updatedAnnouncement = {
+                    ...announcement,
                     time,
                     title,
                     description,
                     date,
-                    author
+                    author,
+                    updatedAt: new Date().toISOString()
                 };
                 
-                // Guardar localmente
-                saveAnnouncementsToLocal();
+                // Guardar en Firebase
+                const firebaseSuccess = await saveAnnouncementToFirebase(updatedAnnouncement);
                 
                 // Restaurar botón
                 document.getElementById('saveEditText').textContent = 'Guardar Cambios';
                 document.getElementById('saveEditLoading').style.display = 'none';
                 document.getElementById('saveEditBtn').disabled = false;
                 
-                // Cerrar panel de edición
-                closeEditPanel();
-                
-                // Mostrar mensaje de éxito
-                showMessage('Anuncio actualizado exitosamente.', 'success');
-                
-                // Actualizar la visualización
-                renderAnnouncements();
-                renderAdminAnnouncements();
+                if (firebaseSuccess) {
+                    // Cerrar panel de edición
+                    closeEditPanel();
+                    
+                    // Mostrar mensaje de éxito
+                    showMessage('Anuncio actualizado exitosamente en la nube.', 'success');
+                } else {
+                    showMessage('Error al actualizar el anuncio. Intenta nuevamente.', 'error');
+                }
             }
         }
 
@@ -1705,22 +1840,16 @@
         }
 
         // Eliminar un anuncio
-        function deleteAnnouncement(id) {
+        async function deleteAnnouncement(id) {
             if (confirm('¿Estás seguro de que quieres eliminar este anuncio?')) {
-                // Filtrar el anuncio a eliminar
-                announcements = announcements.filter(ann => ann.id !== id);
+                // Intentar eliminar de Firebase
+                const firebaseSuccess = await deleteAnnouncementFromFirebase(id);
                 
-                // Guardar localmente
-                saveAnnouncementsToLocal();
-                
-                // Mostrar mensaje
-                showMessage('Anuncio eliminado exitosamente.', 'success');
-                
-                // Actualizar la visualización
-                if (adminPanel.classList.contains('active')) {
-                    renderAdminAnnouncements();
+                if (firebaseSuccess) {
+                    // Mostrar mensaje
+                    showMessage('Anuncio eliminado exitosamente de la nube.', 'success');
                 } else {
-                    renderAnnouncements();
+                    showMessage('Error al eliminar el anuncio. Intenta nuevamente.', 'error');
                 }
             }
         }
@@ -1753,6 +1882,15 @@
             });
             
             sortedAnnouncements.forEach(announcement => {
+                const createdDate = new Date(announcement.createdAt);
+                const formattedDate = createdDate.toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
                 announcementsHTML += `
                     <div class="announcement-card">
                         <h3>${announcement.title}</h3>
@@ -1767,7 +1905,7 @@
                         <div class="announcement-author">
                             <strong>Publicado por:</strong> ${announcement.author}
                             <span style="font-size: 0.7rem; color: #666; display: block; margin-top: 0.2rem;">
-                                Publicado el: ${new Date(announcement.createdAt).toLocaleDateString()}
+                                Publicado el: ${formattedDate}
                             </span>
                         </div>
                     </div>
@@ -1803,6 +1941,15 @@
             });
             
             sortedAnnouncements.forEach(announcement => {
+                const createdDate = new Date(announcement.createdAt);
+                const formattedDate = createdDate.toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
                 adminAnnouncementsHTML += `
                     <div class="announcement-card">
                         <div class="announcement-actions">
@@ -1828,7 +1975,7 @@
                                 (Dispositivo: ${announcement.deviceId?.substring(0, 8)}...)
                             </span>
                             <span style="font-size: 0.7rem; color: #666; display: block; margin-top: 0.2rem;">
-                                Publicado el: ${new Date(announcement.createdAt).toLocaleDateString()}
+                                Publicado el: ${formattedDate}
                             </span>
                         </div>
                     </div>
