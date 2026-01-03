@@ -5,7 +5,1042 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Anuncios - Iglesia</title>
     <style>
-        /* ... (todo el CSS se mantiene igual) ... */
+        /* Estilos generales */
+        :root {
+            --azul-principal: #1e3a8a;
+            --azul-secundario: #3b82f6;
+            --azul-claro: #dbeafe;
+            --blanco: #ffffff;
+            --gris-claro: #f3f4f6;
+            --gris: #9ca3af;
+            --gris-oscuro: #374151;
+            --sombra: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --verde: #10b981;
+            --rojo: #ef4444;
+            --naranja: #f59e0b;
+            --morado: #8b5cf6;
+            --amarillo: #fbbf24;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--gris-claro);
+            color: var(--gris-oscuro);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* Encabezado */
+        .header {
+            background-color: var(--azul-principal);
+            color: var(--blanco);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--sombra);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+        }
+        
+        /* Formulario de login */
+        .login-container {
+            position: relative;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .login-btn, .admin-view-btn {
+            background-color: var(--azul-secundario);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .login-btn:hover, .admin-view-btn:hover {
+            background-color: #2563eb;
+        }
+        
+        .admin-view-btn {
+            background-color: var(--verde);
+        }
+        
+        .admin-view-btn:hover {
+            background-color: #0da271;
+        }
+        
+        .login-form {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--blanco);
+            padding: 1.2rem;
+            border-radius: 8px;
+            box-shadow: var(--sombra);
+            width: 300px;
+            display: none;
+            z-index: 100;
+            margin-top: 0.5rem;
+        }
+        
+        .login-form.active {
+            display: block;
+        }
+        
+        .login-form h3 {
+            margin-bottom: 1rem;
+            color: var(--azul-principal);
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid var(--gris);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--azul-secundario);
+        }
+        
+        .submit-btn {
+            background-color: var(--azul-principal);
+            color: white;
+            border: none;
+            padding: 0.6rem;
+            width: 100%;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .submit-btn:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .logout-btn {
+            background-color: var(--rojo);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            display: none;
+            font-size: 0.9rem;
+        }
+        
+        .logout-btn:hover {
+            background-color: #b91c1c;
+        }
+        
+        /* Botón de volver */
+        .back-btn {
+            background-color: var(--gris);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .back-btn:hover {
+            background-color: #6b7280;
+        }
+        
+        /* Contenedor principal */
+        .container {
+            max-width: 1200px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+        
+        /* Mensaje de bienvenida */
+        .welcome-message {
+            background-color: var(--blanco);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--sombra);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .welcome-message h2 {
+            color: var(--azul-principal);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Pantallas de selección */
+        .selection-screen {
+            background-color: var(--blanco);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--sombra);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .selection-screen h2 {
+            color: var(--azul-principal);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .departments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .department-card {
+            background-color: var(--azul-claro);
+            border-radius: 8px;
+            padding: 1.2rem 1rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid transparent;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .department-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--sombra);
+            border-color: var(--azul-secundario);
+        }
+        
+        .department-card.juvenil {
+            background-color: #e0f2fe;
+        }
+        
+        .department-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--azul-principal);
+        }
+        
+        .department-card h3 {
+            color: var(--azul-principal);
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .department-card p {
+            color: var(--gris-oscuro);
+            font-size: 0.8rem;
+        }
+        
+        /* Opciones JA y Clubes */
+        .option-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .option-card {
+            background-color: var(--blanco);
+            border-radius: 8px;
+            padding: 1.5rem 1rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid var(--azul-claro);
+            text-align: center;
+        }
+        
+        .option-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--sombra);
+            border-color: var(--azul-secundario);
+        }
+        
+        .option-card.ja {
+            background-color: #dbeafe;
+        }
+        
+        .option-card.clubes {
+            background-color: #e0f2fe;
+        }
+        
+        .option-card h4 {
+            color: var(--azul-principal);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .option-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--azul-principal);
+        }
+        
+        /* Subcategorías para Clubes */
+        .subcategories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .subcategory-card {
+            background-color: var(--blanco);
+            border-radius: 8px;
+            padding: 1.5rem 1rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid var(--azul-claro);
+            text-align: center;
+        }
+        
+        .subcategory-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--sombra);
+            border-color: var(--azul-secundario);
+        }
+        
+        .subcategory-card h4 {
+            color: var(--azul-principal);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Sección de formulario de anuncios */
+        .announcement-form-section {
+            background-color: var(--blanco);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--sombra);
+            margin-bottom: 1.5rem;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .announcement-form-section.active {
+            display: block;
+        }
+        
+        .section-title {
+            color: var(--azul-principal);
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--azul-claro);
+            font-size: 1.3rem;
+        }
+        
+        .announcement-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .form-control {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-control label {
+            margin-bottom: 0.4rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .form-control select, 
+        .form-control input, 
+        .form-control textarea {
+            padding: 0.6rem;
+            border: 1px solid var(--gris);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .form-control textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .form-control select:focus, 
+        .form-control input:focus, 
+        .form-control textarea:focus {
+            outline: none;
+            border-color: var(--azul-secundario);
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .btn-submit-announcement {
+            grid-column: 1 / -1;
+            background-color: var(--azul-principal);
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-submit-announcement:hover {
+            background-color: #1d4ed8;
+        }
+        
+        /* Sección para mostrar anuncios */
+        .announcements-section {
+            background-color: var(--blanco);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--sombra);
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .announcements-section.active {
+            display: block;
+        }
+        
+        .current-department {
+            background-color: var(--azul-claro);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .current-department h3 {
+            color: var(--azul-principal);
+            font-size: 1.2rem;
+        }
+        
+        .announcements-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+        }
+        
+        .announcement-card {
+            background-color: var(--azul-claro);
+            border-radius: 8px;
+            padding: 1.2rem;
+            border-left: 4px solid var(--azul-principal);
+            position: relative;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .announcement-card.mine {
+            border-left-color: var(--naranja);
+        }
+        
+        .announcement-card h3 {
+            color: var(--azul-principal);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            padding-right: 50px;
+        }
+        
+        .announcement-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.85rem;
+            color: var(--gris-oscuro);
+        }
+        
+        .announcement-category {
+            background-color: var(--azul-secundario);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .announcement-description {
+            margin-top: 0.8rem;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+        
+        .announcement-author {
+            font-size: 0.8rem;
+            color: var(--gris-oscuro);
+            margin-top: 0.8rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed var(--gris);
+        }
+        
+        /* Botones de acción */
+        .announcement-actions {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.2rem;
+            display: flex;
+            gap: 0.4rem;
+        }
+        
+        .action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .edit-btn {
+            background-color: var(--verde);
+            color: white;
+        }
+        
+        .delete-btn {
+            background-color: var(--rojo);
+            color: white;
+        }
+        
+        /* Panel de administrador */
+        .admin-panel {
+            background-color: var(--blanco);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--sombra);
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .admin-panel.active {
+            display: block;
+        }
+        
+        .admin-announcements {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+        }
+        
+        /* Panel de edición de anuncios */
+        .edit-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .edit-panel.active {
+            display: flex;
+        }
+        
+        .edit-form {
+            background-color: var(--blanco);
+            width: 90%;
+            max-width: 600px;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--sombra);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+        
+        .edit-header h3 {
+            color: var(--azul-principal);
+            font-size: 1.2rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gris-oscuro);
+        }
+        
+        /* Mensajes */
+        .message {
+            padding: 0.8rem;
+            border-radius: 4px;
+            margin-bottom: 1.2rem;
+            text-align: center;
+            display: none;
+            font-size: 0.9rem;
+        }
+        
+        .message.success {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            display: block;
+        }
+        
+        .message.error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            display: block;
+        }
+        
+        .message.info {
+            background-color: var(--azul-claro);
+            color: var(--azul-principal);
+            border: 1px solid var(--azul-secundario);
+            display: block;
+        }
+        
+        .message.warning {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+            display: block;
+        }
+        
+        .empty-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--gris);
+            font-size: 0.95rem;
+        }
+        
+        /* Estado de carga */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,.3);
+            border-radius: 50%;
+            border-top-color: var(--azul-principal);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Información de la nube */
+        .cloud-info {
+            background-color: var(--azul-claro);
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--azul-principal);
+            text-align: center;
+        }
+        
+        /* Instrucciones */
+        .instructions {
+            background-color: var(--blanco);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid var(--gris);
+        }
+        
+        .instructions h4 {
+            color: var(--azul-principal);
+            margin-bottom: 0.5rem;
+        }
+        
+        .instructions ul {
+            padding-left: 1.2rem;
+            font-size: 0.85rem;
+        }
+        
+        /* Barra de navegación de pasos */
+        .step-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--azul-claro);
+        }
+        
+        .step-title {
+            color: var(--azul-principal);
+            font-size: 1.3rem;
+            flex-grow: 1;
+            text-align: center;
+        }
+        
+        /* Estado de conexión */
+        .connection-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            z-index: 1000;
+            background-color: white;
+            box-shadow: var(--sombra);
+        }
+        
+        .connection-status.online {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .connection-status.offline {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        /* Modal de éxito */
+        .success-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .success-modal.active {
+            display: flex;
+        }
+        
+        .success-modal-content {
+            background-color: var(--blanco);
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--sombra);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .success-icon {
+            font-size: 3rem;
+            color: var(--verde);
+            margin-bottom: 1rem;
+        }
+        
+        .success-modal-content h3 {
+            color: var(--azul-principal);
+            margin-bottom: 1rem;
+        }
+        
+        .success-modal-content p {
+            margin-bottom: 1.5rem;
+            color: var(--gris-oscuro);
+        }
+        
+        /* Responsive mejorado para teléfonos */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 0.8rem;
+            }
+            
+            .logo {
+                flex-direction: column;
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .logo h1 {
+                font-size: 1.2rem;
+                text-align: center;
+            }
+            
+            .login-container {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .login-form {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 90%;
+                max-width: 300px;
+            }
+            
+            .departments-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .department-card {
+                min-height: 100px;
+                padding: 1rem 0.8rem;
+            }
+            
+            .department-icon {
+                font-size: 1.8rem;
+            }
+            
+            .department-card h3 {
+                font-size: 0.9rem;
+                margin-bottom: 0.2rem;
+            }
+            
+            .department-card p {
+                font-size: 0.75rem;
+                line-height: 1.2;
+            }
+            
+            .subcategories-grid, .option-cards {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            
+            .announcement-form {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+            
+            .announcements-container, .admin-announcements {
+                grid-template-columns: 1fr;
+            }
+            
+            .announcement-card h3 {
+                padding-right: 0;
+                margin-bottom: 0.8rem;
+                font-size: 1rem;
+            }
+            
+            .announcement-actions {
+                position: static;
+                margin-bottom: 0.8rem;
+                justify-content: flex-end;
+            }
+            
+            .current-department {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.8rem;
+                padding: 0.8rem;
+            }
+            
+            .current-department h3 {
+                font-size: 1.1rem;
+                text-align: center;
+                width: 100%;
+            }
+            
+            .container {
+                padding: 0 0.8rem;
+                margin: 1rem auto;
+            }
+            
+            .connection-status {
+                bottom: 5px;
+                right: 5px;
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
+            
+            .step-nav {
+                flex-direction: column;
+                gap: 0.8rem;
+                align-items: stretch;
+            }
+            
+            .step-title {
+                font-size: 1.1rem;
+                order: 2;
+            }
+            
+            .back-btn {
+                align-self: flex-start;
+                order: 1;
+            }
+            
+            .submit-btn {
+                order: 3;
+                margin-top: 0;
+            }
+            
+            .selection-screen {
+                padding: 1rem;
+            }
+            
+            .selection-screen h2 {
+                font-size: 1.3rem;
+                margin-bottom: 1rem;
+            }
+            
+            .cloud-info {
+                font-size: 0.8rem;
+                padding: 0.6rem;
+            }
+            
+            .success-modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .success-icon {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .departments-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+            }
+            
+            .subcategories-grid, .option-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+            }
+            
+            .department-card {
+                min-height: 90px;
+                padding: 0.8rem 0.6rem;
+            }
+            
+            .logo h1 {
+                font-size: 1.1rem;
+            }
+            
+            .section-title {
+                font-size: 1.2rem;
+            }
+            
+            .announcement-card {
+                padding: 1rem;
+            }
+            
+            .announcement-card h3 {
+                font-size: 0.95rem;
+            }
+            
+            .announcement-description {
+                font-size: 0.85rem;
+            }
+            
+            .welcome-message {
+                padding: 1rem;
+            }
+            
+            .welcome-message h2 {
+                font-size: 1.2rem;
+            }
+            
+            .welcome-message p {
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .departments-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .subcategories-grid, .option-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .department-card {
+                min-height: 85px;
+            }
+            
+            .logo h1 {
+                font-size: 1rem;
+            }
+            
+            .login-btn, .logout-btn, .admin-view-btn, .back-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
     </style>
     
     <!-- Firebase SDK version 12.7.0 -->
@@ -40,7 +1075,369 @@
     </script>
 </head>
 <body>
-    <!-- ... (todo el HTML se mantiene igual) ... -->
+    <!-- Encabezado con login -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">⛪</div>
+            <h1>Gestor de Anuncios - Iglesia</h1>
+        </div>
+        <div class="login-container">
+            <button id="loginBtn" class="login-btn">Iniciar Sesión</button>
+            <div id="loginForm" class="login-form">
+                <h3>Acceso Administrador</h3>
+                <div class="form-group">
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" placeholder="Ingresa tu usuario" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" placeholder="Ingresa tu contraseña" autocomplete="off">
+                </div>
+                <button id="submitLogin" class="submit-btn">Ingresar</button>
+            </div>
+            <button id="logoutBtn" class="logout-btn">Cerrar Sesión</button>
+            <button id="adminViewBtn" class="admin-view-btn" style="display: none;">Vista Admin</button>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="container">
+        <!-- Mensaje de bienvenida -->
+        <div id="welcomeMessage" class="welcome-message">
+            <h2>Bienvenido al Sistema de Anuncios de la Iglesia</h2>
+            <p>Selecciona tu departamento o ministerio para publicar un anuncio</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+                <strong>IMPORTANTE:</strong> La página se recargará automáticamente después de guardar, editar o eliminar anuncios
+            </p>
+            <div id="syncStatus" class="message info" style="margin-top: 1rem; display: none;">
+                <span id="syncStatusText">Conectando con la base de datos...</span>
+            </div>
+        </div>
+
+        <!-- Pantalla de selección de departamento principal -->
+        <section id="departmentSelection" class="selection-screen">
+            <div class="step-nav">
+                <button id="backBtn" class="back-btn" style="display: none;">← Volver</button>
+                <h2 class="step-title">Selecciona tu Departamento o Ministerio</h2>
+            </div>
+            <div class="departments-grid">
+                <!-- Ministerio Joven -->
+                <div class="department-card juvenil" data-department="Ministerio Joven">
+                    <div class="department-icon">👨‍🎓</div>
+                    <h3>Ministerio Joven</h3>
+                    <p>JA y Clubes (Aventureros, Conquistadores, Guías)</p>
+                </div>
+                
+                <!-- Ministerio Infantil -->
+                <div class="department-card" data-department="Ministerio Infantil">
+                    <div class="department-icon">👶</div>
+                    <h3>Ministerio Infantil</h3>
+                    <p>Anuncios para niños</p>
+                </div>
+                
+                <!-- Escuela Sabática -->
+                <div class="department-card" data-department="Escuela Sabática">
+                    <div class="department-icon">📚</div>
+                    <h3>Escuela Sabática</h3>
+                    <p>Clases y estudios bíblicos</p>
+                </div>
+                
+                <!-- Ministerio Personal -->
+                <div class="department-card" data-department="Ministerio Personal">
+                    <div class="department-icon">🙏</div>
+                    <h3>Ministerio Personal</h3>
+                    <p>Crecimiento espiritual</p>
+                </div>
+                
+                <!-- Ministerio de la Mujer -->
+                <div class="department-card" data-department="Ministerio de la Mujer">
+                    <div class="department-icon">👩</div>
+                    <h3>Ministerio de la Mujer</h3>
+                    <p>Actividades para mujeres</p>
+                </div>
+                
+                <!-- Ministerio de la Familia -->
+                <div class="department-card" data-department="Ministerio de la Familia">
+                    <div class="department-icon">👨‍👩‍👧‍👦</div>
+                    <h3>Ministerio de la Familia</h3>
+                    <p>Anuncios familiares</p>
+                </div>
+                
+                <!-- Mayordomía Cristiana -->
+                <div class="department-card" data-department="Mayordomía Cristiana">
+                    <div class="department-icon">💼</div>
+                    <h3>Mayordomía Cristiana</h3>
+                    <p>Administración y recursos</p>
+                </div>
+                
+                <!-- Ministerio de Salud -->
+                <div class="department-card" data-department="Ministerio de Salud">
+                    <div class="department-icon">🏥</div>
+                    <h3>Ministerio de Salud</h3>
+                    <p>Salud y bienestar</p>
+                </div>
+                
+                <!-- Comunicación -->
+                <div class="department-card" data-department="Comunicación">
+                    <div class="department-icon">📢</div>
+                    <h3>Comunicación</h3>
+                    <p>Medios y difusión</p>
+                </div>
+                
+                <!-- Director de Canto -->
+                <div class="department-card" data-department="Director de Canto">
+                    <div class="department-icon">🎤</div>
+                    <h3>Director de Canto</h3>
+                    <p>Alabanza y música</p>
+                </div>
+                
+                <!-- Director de Sonido -->
+                <div class="department-card" data-department="Director de Sonido">
+                    <div class="department-icon">🎧</div>
+                    <h3>Director de Sonido</h3>
+                    <p>Audiovisual y sonido</p>
+                </div>
+                
+                <!-- Dorcas -->
+                <div class="department-card" data-department="Dorcas">
+                    <div class="department-icon">❤️</div>
+                    <h3>Dorcas</h3>
+                    <p>Servicio y ayuda social</p>
+                </div>
+                
+                <!-- Libertad Religiosa -->
+                <div class="department-card" data-department="Libertad Religiosa">
+                    <div class="department-icon">⚖️</div>
+                    <h3>Libertad Religiosa</h3>
+                    <p>Derechos y libertades</p>
+                </div>
+                
+                <!-- Diáconos y Diaconisas -->
+                <div class="department-card" data-department="Diáconos y Diaconisas">
+                    <div class="department-icon">👨‍💼</div>
+                    <h3>Diáconos y Diaconisas</h3>
+                    <p>Servicio en la iglesia</p>
+                </div>
+                
+                <!-- Ancianos de Iglesia -->
+                <div class="department-card" data-department="Ancianos de Iglesia">
+                    <div class="department-icon">👴</div>
+                    <h3>Ancianos de Iglesia</h3>
+                    <p>Consejo de ancianos</p>
+                </div>
+                
+                <!-- Secretaría -->
+                <div class="department-card" data-department="Secretaría de Iglesia">
+                    <div class="department-icon">📝</div>
+                    <h3>Secretaría de Iglesia</h3>
+                    <p>Documentación y registros</p>
+                </div>
+                
+                <!-- Tesorería -->
+                <div class="department-card" data-department="Tesoreria">
+                    <div class="department-icon">💰</div>
+                    <h3>Tesoreria</h3>
+                    <p>Finanzas de la iglesia</p>
+                </div>
+            </div>
+            
+            <!-- Información de la nube -->
+            <div class="cloud-info">
+                ℹ️ Los anuncios se guardan automáticamente en la nube. El administrador puede ver todos los anuncios desde cualquier dispositivo.
+            </div>
+        </section>
+
+        <!-- Pantalla de selección Ministerio Joven (JA o Clubes) -->
+        <section id="juvenilSelection" class="selection-screen" style="display: none;">
+            <div class="step-nav">
+                <button id="backToDepartmentsBtn" class="back-btn">← Volver</button>
+                <h2 class="step-title">Ministerio Joven - Selecciona una opción</h2>
+            </div>
+            <div class="option-cards">
+                <div class="option-card ja" data-option="JA">
+                    <div class="option-icon">🙋‍♂️</div>
+                    <h4>Jóvenes Adventistas (JA)</h4>
+                    <p>Anuncios para jóvenes de 16+ años</p>
+                </div>
+                <div class="option-card clubes" data-option="Clubes">
+                    <div class="option-icon">🏕️</div>
+                    <h4>Clubes</h4>
+                    <p>Aventureros, Conquistadores, Guías Mayores</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla de selección de Clubes -->
+        <section id="clubesSelection" class="selection-screen" style="display: none;">
+            <div class="step-nav">
+                <button id="backToJuvenilBtn" class="back-btn">← Volver</button>
+                <h2 class="step-title">Clubes - Selecciona un club</h2>
+            </div>
+            <div class="subcategories-grid">
+                <div class="subcategory-card" data-department="Aventureros">
+                    <div class="option-icon">🧒</div>
+                    <h4>Aventureros</h4>
+                    <p>Niños 6-9 años</p>
+                </div>
+                <div class="subcategory-card" data-department="Conquistadores">
+                    <div class="option-icon">🧑</div>
+                    <h4>Conquistadores</h4>
+                    <p>Jóvenes 10-15 años</p>
+                </div>
+                <div class="subcategory-card" data-department="Guías Mayores">
+                    <div class="option-icon">👨‍🎓</div>
+                    <h4>Guías Mayores</h4>
+                    <p>Jóvenes 16-21 años</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de formulario de anuncios -->
+        <section id="announcementFormSection" class="announcement-form-section">
+            <div class="step-nav">
+                <button id="backToSelectionBtn" class="back-btn">← Volver</button>
+                <h2 class="step-title" id="formSectionTitle">Crear Nuevo Anuncio</h2>
+            </div>
+            <form id="announcementForm" class="announcement-form">
+                <input type="hidden" id="selectedDepartment">
+                <div class="form-control">
+                    <label for="time">Hora del evento:</label>
+                    <input type="time" id="time" required>
+                </div>
+                <div class="form-control">
+                    <label for="title">Título del anuncio:</label>
+                    <input type="text" id="title" placeholder="Ej: Reunión de oración" required>
+                </div>
+                <div class="form-control">
+                    <label for="date">Fecha del evento:</label>
+                    <input type="date" id="date" required>
+                </div>
+                <div class="form-control">
+                    <label for="author">Tu nombre (autor):</label>
+                    <input type="text" id="author" placeholder="Tu nombre" required>
+                </div>
+                <div class="form-control full-width">
+                    <label for="description">Descripción:</label>
+                    <textarea id="description" placeholder="Describe los detalles del anuncio..." required></textarea>
+                </div>
+                <button type="submit" class="btn-submit-announcement" id="submitAnnouncementBtn">
+                    <span id="submitBtnText">Publicar Anuncio</span>
+                    <span id="submitLoading" class="loading" style="display: none;"></span>
+                </button>
+            </form>
+            <div id="formMessage" class="message"></div>
+            
+            <!-- Instrucciones para el usuario -->
+            <div class="instructions">
+                <h4>¿Cómo funciona?</h4>
+                <ul>
+                    <li>Completa todos los campos del formulario</li>
+                    <li>Haz clic en "Publicar Anuncio" para guardar tu anuncio en la nube</li>
+                    <li>Tu anuncio se sincronizará automáticamente con todos los dispositivos</li>
+                    <li>El administrador podrá ver tu anuncio desde cualquier dispositivo</li>
+                    <li>El administrador puede editar o eliminar anuncios desde la vista de administrador</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Sección para mostrar anuncios del departamento -->
+        <section id="announcementsSection" class="announcements-section">
+            <div class="step-nav">
+                <button id="backToAnnouncementsBtn" class="back-btn">← Volver</button>
+                <h2 class="step-title" id="currentDepartmentTitle">Anuncios del Departamento</h2>
+                <button id="createAnnouncementBtn" class="submit-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">+ Crear Anuncio</button>
+            </div>
+            <div id="announcementsContainer" class="announcements-container">
+                <!-- Los anuncios se cargarán aquí dinámicamente -->
+                <div class="empty-message" id="emptyMessage">
+                    No hay anuncios para este departamento. ¡Crea el primer anuncio!
+                </div>
+            </div>
+        </section>
+
+        <!-- Panel de administrador -->
+        <section id="adminPanel" class="admin-panel">
+            <div class="step-nav">
+                <button id="backToMainFromAdminBtn" class="back-btn">← Volver</button>
+                <h2 class="step-title">Panel de Administrador - Todos los Anuncios</h2>
+                <button id="refreshCloudBtn" class="submit-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; background-color: var(--verde);">🔄 Actualizar</button>
+            </div>
+            <div class="current-department">
+                <h3>Vista completa de todos los anuncios de todos los departamentos</h3>
+                <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+                    Aquí puedes ver, editar y eliminar todos los anuncios publicados por los usuarios desde cualquier dispositivo.
+                </p>
+            </div>
+            <div id="adminAnnouncements" class="admin-announcements">
+                <!-- Los anuncios del panel de administrador se cargarán aquí -->
+                <div class="empty-message" id="adminEmptyMessage">
+                    No hay anuncios para mostrar.
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Panel de edición de anuncios -->
+    <div id="editPanel" class="edit-panel">
+        <div class="edit-form">
+            <div class="edit-header">
+                <h3>Editar Anuncio</h3>
+                <button id="closeEditBtn" class="close-btn">×</button>
+            </div>
+            <form id="editAnnouncementForm">
+                <input type="hidden" id="editId">
+                <input type="hidden" id="editAuthor">
+                <div class="announcement-form">
+                    <div class="form-control">
+                        <label for="editDepartment">Departamento:</label>
+                        <input type="text" id="editDepartment" readonly style="background-color: #f3f4f6;">
+                    </div>
+                    <div class="form-control">
+                        <label for="editTime">Hora del evento:</label>
+                        <input type="time" id="editTime" required>
+                    </div>
+                    <div class="form-control">
+                        <label for="editTitle">Título del anuncio:</label>
+                        <input type="text" id="editTitle" placeholder="Ej: Reunión de oración" required>
+                    </div>
+                    <div class="form-control">
+                        <label for="editDate">Fecha del evento:</label>
+                        <input type="date" id="editDate" required>
+                    </div>
+                    <div class="form-control">
+                        <label for="editAuthorDisplay">Autor:</label>
+                        <input type="text" id="editAuthorDisplay" style="background-color: #f3f4f6;">
+                    </div>
+                    <div class="form-control full-width">
+                        <label for="editDescription">Descripción:</label>
+                        <textarea id="editDescription" placeholder="Describe los detalles del anuncio..." required></textarea>
+                    </div>
+                    <div class="form-control" style="grid-column: 1 / -1; display: flex; gap: 1rem;">
+                        <button type="submit" class="btn-submit-announcement" style="flex: 1;" id="saveEditBtn">
+                            <span id="saveEditText">Guardar Cambios</span>
+                            <span id="saveEditLoading" class="loading" style="display: none;"></span>
+                        </button>
+                        <button type="button" id="cancelEditBtn" class="btn-submit-announcement" style="background-color: var(--gris); flex: 1;">Cancelar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div id="successModal" class="success-modal">
+        <div class="success-modal-content">
+            <div class="success-icon" id="successIcon">✓</div>
+            <h3 id="successTitle">¡Operación Exitosa!</h3>
+            <p id="successMessage">La operación se completó correctamente.</p>
+            <button id="closeSuccessModal" class="submit-btn">Aceptar</button>
+        </div>
+    </div>
+
+    <!-- Estado de conexión -->
+    <div id="connectionStatus" class="connection-status">
+        <span id="connectionStatusText">Conectando...</span>
+    </div>
 
     <script>
         // Credenciales de administrador
@@ -57,9 +1454,8 @@
         let deviceId = null;
         let lastView = 'departmentSelection'; // Para manejar navegación
         let isProcessing = false; // Para evitar múltiples operaciones simultáneas
-        let isInitialLoad = true; // Para controlar carga inicial
 
-        // Elementos del DOM (se mantienen igual)
+        // Elementos del DOM
         const loginBtn = document.getElementById('loginBtn');
         const logoutBtn = document.getElementById('logoutBtn');
         const adminViewBtn = document.getElementById('adminViewBtn');
@@ -113,12 +1509,6 @@
             
             currentUser = localStorage.getItem('currentUserId');
             
-            // Restaurar el departamento seleccionado desde LocalStorage
-            const savedDepartment = localStorage.getItem('selectedDepartment');
-            if (savedDepartment) {
-                currentDepartment = savedDepartment;
-            }
-            
             // Mostrar estado de conexión
             syncStatus.style.display = 'block';
             syncStatusText.textContent = 'Conectando con la base de datos...';
@@ -136,40 +1526,11 @@
             // Configurar event listeners
             setupEventListeners();
             
-            // Manejar vista basada en hash de URL
-            const hash = window.location.hash.substring(1);
-            if (currentDepartment && hash === 'announcements') {
-                document.getElementById('currentDepartmentTitle').textContent = `Anuncios: ${currentDepartment}`;
-                showView('announcements');
-            } else if (hash === 'admin' && isAdminLoggedIn) {
-                showView('admin');
-            } else {
-                // Mostrar vista inicial
-                showView('departmentSelection');
-            }
-            
-            isInitialLoad = false;
-            
-            // Escuchar cambios en el hash de URL
-            window.addEventListener('hashchange', handleHashChange);
+            // Mostrar vista inicial
+            showView('departmentSelection');
         }
 
-        // Manejar cambios en el hash de URL
-        function handleHashChange() {
-            if (isInitialLoad) return;
-            
-            const hash = window.location.hash.substring(1);
-            if (hash === 'announcements' && currentDepartment) {
-                document.getElementById('currentDepartmentTitle').textContent = `Anuncios: ${currentDepartment}`;
-                showView('announcements');
-            } else if (hash === 'admin' && isAdminLoggedIn) {
-                showView('admin');
-            } else {
-                showView('departmentSelection');
-            }
-        }
-
-        // Actualizar estado de conexión (se mantiene igual)
+        // Actualizar estado de conexión
         function updateConnectionStatus(connected) {
             if (connected) {
                 connectionStatus.className = 'connection-status online';
@@ -180,7 +1541,7 @@
             }
         }
 
-        // Cargar anuncios desde Firebase (se mantiene igual)
+        // Cargar anuncios desde Firebase
         function loadAnnouncementsFromFirebase() {
             if (!window.firebaseDatabase) {
                 console.error("Firebase no está inicializado");
@@ -235,7 +1596,7 @@
             }
         }
 
-        // Actualizar todas las vistas activas (se mantiene igual)
+        // Actualizar todas las vistas activas
         function updateAllViews() {
             // Si estamos en vista de anuncios, actualizar
             if (announcementsSection.classList.contains('active')) {
@@ -248,7 +1609,7 @@
             }
         }
 
-        // Guardar anuncios en Firebase (se mantiene igual)
+        // Guardar anuncios en Firebase
         async function saveAnnouncementToFirebase(announcement) {
             if (!window.firebaseDatabase) {
                 console.error("Firebase no está inicializado");
@@ -272,7 +1633,7 @@
             }
         }
 
-        // Eliminar anuncio de Firebase (se mantiene igual)
+        // Eliminar anuncio de Firebase
         async function deleteAnnouncementFromFirebase(id) {
             if (!window.firebaseDatabase) {
                 console.error("Firebase no está inicializado");
@@ -290,7 +1651,7 @@
             }
         }
 
-        // Mostrar modal de éxito (se mantiene igual)
+        // Mostrar modal de éxito
         function showSuccessModal(title, message, icon = "✓") {
             successTitle.textContent = title;
             successMessage.textContent = message;
@@ -298,12 +1659,144 @@
             successModal.classList.add('active');
         }
 
-        // Configurar event listeners (se mantiene igual excepto por el hashchange)
+        // Configurar event listeners
         function setupEventListeners() {
-            // ... (todos los event listeners se mantienen igual) ...
+            // Toggle formulario de login
+            loginBtn.addEventListener('click', () => {
+                loginForm.classList.toggle('active');
+            });
+            
+            // Cerrar formulario de login al hacer clic fuera
+            document.addEventListener('click', (e) => {
+                if (!loginForm.contains(e.target) && e.target !== loginBtn) {
+                    loginForm.classList.remove('active');
+                }
+            });
+            
+            // Enviar formulario de login
+            submitLogin.addEventListener('click', handleLogin);
+            
+            // También permitir login con Enter
+            usernameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+            
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+            
+            // Cerrar sesión
+            logoutBtn.addEventListener('click', handleLogout);
+            
+            // Botón de vista admin
+            adminViewBtn.addEventListener('click', showAdminView);
+            
+            // Botón para crear anuncio
+            createAnnouncementBtn.addEventListener('click', () => {
+                showView('form');
+            });
+            
+            // Botón para refrescar datos
+            refreshCloudBtn.addEventListener('click', () => {
+                syncStatusText.textContent = 'Actualizando datos...';
+                syncStatus.className = 'message info';
+                // Simular recarga forzando una nueva lectura
+                loadAnnouncementsFromFirebase();
+                setTimeout(() => {
+                    showSuccessModal('¡Datos Actualizados!', 'Los anuncios se han actualizado correctamente.', '🔄');
+                }, 300);
+            });
+            
+            // Botones de navegación
+            backToDepartmentsBtn.addEventListener('click', () => {
+                showView('departmentSelection');
+            });
+            
+            backToJuvenilBtn.addEventListener('click', () => {
+                showView('juvenil');
+            });
+            
+            backToSelectionBtn.addEventListener('click', () => {
+                goBack();
+            });
+            
+            backToAnnouncementsBtn.addEventListener('click', () => {
+                goBack();
+            });
+            
+            backToMainFromAdminBtn.addEventListener('click', () => {
+                showView('departmentSelection');
+            });
+            
+            // Enviar formulario de anuncio
+            document.getElementById('announcementForm').addEventListener('submit', handleAnnouncementSubmit);
+            
+            // Cerrar panel de edición
+            document.getElementById('closeEditBtn').addEventListener('click', closeEditPanel);
+            document.getElementById('cancelEditBtn').addEventListener('click', closeEditPanel);
+            
+            // Enviar formulario de edición
+            document.getElementById('editAnnouncementForm').addEventListener('submit', handleEditAnnouncement);
+            
+            // Cerrar panel de edición al hacer clic fuera
+            document.getElementById('editPanel').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('editPanel')) {
+                    closeEditPanel();
+                }
+            });
+            
+            // Cerrar modal de éxito
+            closeSuccessModal.addEventListener('click', () => {
+                successModal.classList.remove('active');
+            });
+            
+            // Cerrar modal de éxito al hacer clic fuera
+            successModal.addEventListener('click', (e) => {
+                if (e.target === successModal) {
+                    successModal.classList.remove('active');
+                }
+            });
+            
+            // Seleccionar departamento (excepto Ministerio Joven)
+            document.querySelectorAll('.department-card:not([data-department="Ministerio Joven"])').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    const department = card.getAttribute('data-department');
+                    selectDepartment(department);
+                });
+            });
+            
+            // Seleccionar Ministerio Joven
+            document.querySelector('.department-card[data-department="Ministerio Joven"]').addEventListener('click', () => {
+                showView('juvenil');
+            });
+            
+            // Seleccionar opción JA o Clubes
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const option = card.getAttribute('data-option');
+                    
+                    if (option === 'JA') {
+                        selectDepartment('JA');
+                    } else if (option === 'Clubes') {
+                        showView('clubes');
+                    }
+                });
+            });
+            
+            // Seleccionar subcategoría de Clubes
+            document.querySelectorAll('.subcategory-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const department = card.getAttribute('data-department');
+                    selectDepartment(department);
+                });
+            });
         }
 
-        // Función para volver atrás (se mantiene igual)
+        // Función para volver atrás
         function goBack() {
             if (announcementFormSection.classList.contains('active')) {
                 // Si estamos en formulario, volver a anuncios
@@ -329,7 +1822,7 @@
             }
         }
 
-        // Manejar login de administrador (se mantiene igual)
+        // Manejar login de administrador
         function handleLogin() {
             const username = usernameInput.value.trim();
             const password = passwordInput.value;
@@ -347,7 +1840,7 @@
             }
         }
 
-        // Manejar logout de administrador (se mantiene igual)
+        // Manejar logout de administrador
         function handleLogout() {
             isAdminLoggedIn = false;
             localStorage.removeItem('adminSession');
@@ -358,7 +1851,7 @@
             showView('departmentSelection');
         }
 
-        // Actualizar la UI según el estado de login (se mantiene igual)
+        // Actualizar la UI según el estado de login
         function updateLoginUI() {
             if (isAdminLoggedIn) {
                 loginBtn.style.display = 'none';
@@ -385,43 +1878,24 @@
             if (view === 'departmentSelection') {
                 departmentSelection.style.display = 'block';
                 document.getElementById('welcomeMessage').style.display = 'block';
-                // Limpiar el departamento seleccionado cuando volvemos a la selección
-                localStorage.removeItem('selectedDepartment');
-                currentDepartment = null;
-                window.location.hash = '';
             } else if (view === 'juvenil') {
                 juvenilSelection.style.display = 'block';
-                // Limpiar departamento si estamos en selección
-                localStorage.removeItem('selectedDepartment');
-                currentDepartment = null;
-                window.location.hash = '';
             } else if (view === 'clubes') {
                 clubesSelection.style.display = 'block';
-                // Limpiar departamento si estamos en selección
-                localStorage.removeItem('selectedDepartment');
-                currentDepartment = null;
-                window.location.hash = '';
             } else if (view === 'form') {
                 announcementFormSection.classList.add('active');
                 document.getElementById('formSectionTitle').textContent = `Crear Anuncio para: ${currentDepartment}`;
                 document.getElementById('selectedDepartment').value = currentDepartment;
-                window.location.hash = 'form';
             } else if (view === 'announcements') {
                 announcementsSection.classList.add('active');
-                // Asegurarnos de que el título sea correcto
-                if (currentDepartment) {
-                    document.getElementById('currentDepartmentTitle').textContent = `Anuncios: ${currentDepartment}`;
-                }
                 renderAnnouncements();
-                window.location.hash = 'announcements';
             } else if (view === 'admin') {
                 adminPanel.classList.add('active');
                 renderAdminAnnouncements();
-                window.location.hash = 'admin';
             }
         }
 
-        // Obtener vista actual (se mantiene igual)
+        // Obtener vista actual
         function getCurrentView() {
             if (departmentSelection.style.display === 'block') return 'departmentSelection';
             if (juvenilSelection.style.display === 'block') return 'juvenil';
@@ -432,7 +1906,7 @@
             return 'departmentSelection';
         }
 
-        // Ocultar todas las vistas (se mantiene igual)
+        // Ocultar todas las vistas
         function hideAllViews() {
             departmentSelection.style.display = 'none';
             juvenilSelection.style.display = 'none';
@@ -446,13 +1920,11 @@
         // Seleccionar un departamento
         function selectDepartment(department) {
             currentDepartment = department;
-            // Guardar en LocalStorage
-            localStorage.setItem('selectedDepartment', department);
             document.getElementById('currentDepartmentTitle').textContent = `Anuncios: ${department}`;
             showView('announcements');
         }
 
-        // Mostrar vista de administrador (se mantiene igual)
+        // Mostrar vista de administrador
         function showAdminView() {
             if (!isAdminLoggedIn) {
                 showMessage('Debes iniciar sesión como administrador primero.', 'error');
@@ -530,10 +2002,6 @@
                 
                 // Recargar la página después de 2 segundos
                 setTimeout(() => {
-                    // Limpiar hash de URL y departamento seleccionado
-                    window.location.hash = '';
-                    localStorage.removeItem('selectedDepartment');
-                    currentDepartment = null;
                     window.location.reload();
                 }, 2000);
                 
@@ -606,10 +2074,6 @@
                     
                     // Recargar la página después de 2 segundos
                     setTimeout(() => {
-                        // Limpiar hash de URL y departamento seleccionado
-                        window.location.hash = '';
-                        localStorage.removeItem('selectedDepartment');
-                        currentDepartment = null;
                         window.location.reload();
                     }, 2000);
                     
@@ -625,7 +2089,7 @@
             }
         }
 
-        // Abrir panel de edición para un anuncio específico (se mantiene igual)
+        // Abrir panel de edición para un anuncio específico
         function openEditPanel(id) {
             // Buscar el anuncio
             const announcement = announcements.find(ann => ann.id === id);
@@ -645,7 +2109,7 @@
             }
         }
 
-        // Cerrar panel de edición (se mantiene igual)
+        // Cerrar panel de edición
         function closeEditPanel() {
             document.getElementById('editPanel').classList.remove('active');
             document.getElementById('editAnnouncementForm').reset();
@@ -678,10 +2142,6 @@
                     
                     // Recargar la página después de 2 segundos
                     setTimeout(() => {
-                        // Limpiar hash de URL y departamento seleccionado
-                        window.location.hash = '';
-                        localStorage.removeItem('selectedDepartment');
-                        currentDepartment = null;
                         window.location.reload();
                     }, 2000);
                     
@@ -693,24 +2153,16 @@
 
         // Renderizar anuncios del departamento actual
         function renderAnnouncements() {
-            const emptyMessage = document.getElementById('emptyMessage');
-            const announcementsContainer = document.getElementById('announcementsContainer');
-            
-            // Si no hay departamento seleccionado, mostrar mensaje
-            if (!currentDepartment) {
-                emptyMessage.textContent = 'Por favor selecciona un departamento primero.';
-                emptyMessage.style.display = 'block';
-                announcementsContainer.innerHTML = '';
-                announcementsContainer.appendChild(emptyMessage);
-                return;
-            }
+            if (!currentDepartment) return;
             
             // Filtrar anuncios del departamento actual
             let departmentAnnouncements = announcements.filter(ann => ann.department === currentDepartment);
             
             // Mostrar mensaje si no hay anuncios
+            const emptyMessage = document.getElementById('emptyMessage');
+            const announcementsContainer = document.getElementById('announcementsContainer');
+            
             if (departmentAnnouncements.length === 0) {
-                emptyMessage.textContent = `No hay anuncios para ${currentDepartment}. ¡Crea el primer anuncio!`;
                 emptyMessage.style.display = 'block';
                 announcementsContainer.innerHTML = '';
                 announcementsContainer.appendChild(emptyMessage);
@@ -762,7 +2214,7 @@
             announcementsContainer.innerHTML = announcementsHTML;
         }
 
-        // Renderizar todos los anuncios en el panel de administrador (se mantiene igual)
+        // Renderizar todos los anuncios en el panel de administrador
         function renderAdminAnnouncements() {
             // Mostrar mensaje si no hay anuncios
             const adminEmptyMessage = document.getElementById('adminEmptyMessage');
@@ -834,7 +2286,7 @@
             adminAnnouncementsContainer.innerHTML = adminAnnouncementsHTML;
         }
 
-        // Mostrar mensajes temporales (se mantiene igual)
+        // Mostrar mensajes temporales
         function showMessage(text, type) {
             const formMessage = document.getElementById('formMessage');
             formMessage.textContent = text;
