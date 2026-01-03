@@ -1107,7 +1107,7 @@
             <h2>Bienvenido al Sistema de Anuncios de la Iglesia</h2>
             <p>Selecciona tu departamento o ministerio para publicar un anuncio</p>
             <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
-                <strong>IMPORTANTE:</strong> Después de enviar el anuncio recargar la página para que este se envie de manera exitosa
+                <strong>IMPORTANTE:</strong> La página se recargará automáticamente después de guardar, editar o eliminar anuncios
             </p>
             <div id="syncStatus" class="message info" style="margin-top: 1rem; display: none;">
                 <span id="syncStatusText">Conectando con la base de datos...</span>
@@ -1992,23 +1992,18 @@
                 document.getElementById('title').value = '';
                 document.getElementById('date').value = '';
                 document.getElementById('description').value = '';
-                // El campo de autor se mantiene
                 
                 // Mostrar modal de éxito
                 showSuccessModal(
                     '¡Anuncio Publicado!', 
-                    'Tu anuncio se ha publicado exitosamente en la nube. El administrador puede verlo desde cualquier dispositivo.',
+                    'Tu anuncio se ha publicado exitosamente. La página se recargará automáticamente.',
                     '📢'
                 );
                 
-                // Forzar recarga de datos después de 1.5 segundos
+                // Recargar la página después de 2 segundos
                 setTimeout(() => {
-                    // Recargar datos desde Firebase
-                    loadAnnouncementsFromFirebase();
-                    
-                    // Volver a la vista de anuncios
-                    showView('announcements');
-                }, 1500);
+                    window.location.reload();
+                }, 2000);
                 
             } else {
                 showMessage('Error al publicar el anuncio. Intenta nuevamente.', 'error');
@@ -2073,15 +2068,14 @@
                     // Mostrar modal de éxito
                     showSuccessModal(
                         '¡Anuncio Actualizado!', 
-                        'El anuncio se ha actualizado exitosamente en la nube.',
+                        'El anuncio se ha actualizado exitosamente. La página se recargará automáticamente.',
                         '✏️'
                     );
                     
-                    // Forzar recarga de datos después de 1.5 segundos
+                    // Recargar la página después de 2 segundos
                     setTimeout(() => {
-                        // Recargar datos desde Firebase
-                        loadAnnouncementsFromFirebase();
-                    }, 1500);
+                        window.location.reload();
+                    }, 2000);
                     
                 } else {
                     showMessage('Error al actualizar el anuncio. Intenta nuevamente.', 'error');
@@ -2142,15 +2136,14 @@
                     // Mostrar modal de éxito
                     showSuccessModal(
                         '¡Anuncio Eliminado!', 
-                        'El anuncio se ha eliminado exitosamente de la nube.',
+                        'El anuncio se ha eliminado exitosamente. La página se recargará automáticamente.',
                         '🗑️'
                     );
                     
-                    // Forzar recarga de datos después de 1.5 segundos
+                    // Recargar la página después de 2 segundos
                     setTimeout(() => {
-                        // Recargar datos desde Firebase
-                        loadAnnouncementsFromFirebase();
-                    }, 1500);
+                        window.location.reload();
+                    }, 2000);
                     
                 } else {
                     showMessage('Error al eliminar el anuncio. Intenta nuevamente.', 'error');
@@ -2310,4 +2303,3 @@
     </script>
 </body>
 </html>
-
