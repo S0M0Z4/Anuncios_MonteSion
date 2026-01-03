@@ -818,6 +818,47 @@
             color: var(--gris-oscuro);
         }
         
+        /* Overlay de carga */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            flex-direction: column;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-overlay-content {
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--blanco);
+            border-radius: 8px;
+            box-shadow: var(--sombra);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .loading-overlay-icon {
+            font-size: 3rem;
+            color: var(--azul-principal);
+            margin-bottom: 1rem;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
         /* Responsive mejorado para teléfonos */
         @media (max-width: 768px) {
             .header {
@@ -968,6 +1009,15 @@
             .success-icon {
                 font-size: 2.5rem;
             }
+            
+            .loading-overlay-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .loading-overlay-icon {
+                font-size: 2.5rem;
+            }
         }
         
         @media (max-width: 480px) {
@@ -1100,6 +1150,16 @@
         </div>
     </header>
 
+    <!-- Overlay de carga -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-overlay-content">
+            <div class="loading-overlay-icon">⏳</div>
+            <h3 id="loadingTitle">Cargando...</h3>
+            <p id="loadingMessage">Por favor espera mientras se actualiza la página.</p>
+            <div class="loading" style="margin: 1rem auto;"></div>
+        </div>
+    </div>
+
     <!-- Contenido principal -->
     <main class="container">
         <!-- Mensaje de bienvenida -->
@@ -1107,7 +1167,7 @@
             <h2>Bienvenido al Sistema de Anuncios de la Iglesia</h2>
             <p>Selecciona tu departamento o ministerio para publicar un anuncio</p>
             <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
-                <strong>IMPORTANTE:</strong> La página se recargará automáticamente después de guardar, editar o eliminar anuncios
+                <strong>IMPORTANTE:</strong> La página se recargará automáticamente después de ciertas acciones
             </p>
             <div id="syncStatus" class="message info" style="margin-top: 1rem; display: none;">
                 <span id="syncStatusText">Conectando con la base de datos...</span>
@@ -1452,9 +1512,9 @@
         let currentUser = null;
         let currentDepartment = null;
         let deviceId = null;
-        let lastView = 'departmentSelection'; // Para manejar navegación
-        let isProcessing = false; // Para evitar múltiples operaciones simultáneas
-        let isInitialLoad = true; // Para controlar carga inicial
+        let lastView = 'departmentSelection';
+        let isProcessing = false;
+        let needsReload = false;
 
         // Elementos del DOM
         const loginBtn = document.getElementById('loginBtn');
@@ -1486,9 +1546,22 @@
         const successMessage = document.getElementById('successMessage');
         const successIcon = document.getElementById('successIcon');
         const closeSuccessModal = document.getElementById('closeSuccessModal');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingTitle = document.getElementById('loadingTitle');
+        const loadingMessage = document.getElementById('loadingMessage');
 
         // Inicializar la aplicación
         function initApp() {
+            // Verificar si necesitamos recargar
+            if (sessionStorage.getItem('needsReload') === 'true') {
+                sessionStorage.removeItem('needsReload');
+                showLoadingOverlay('Actualizando página...', 'La página se está recargando para mostrar los datos actualizados.');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+                return;
+            }
+            
             // Establecer fecha mínima en los campos de fecha
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('date').min = today;
@@ -1510,12 +1583,6 @@
             
             currentUser = localStorage.getItem('currentUserId');
             
-            // Restaurar el departamento seleccionado desde LocalStorage
-            const savedDepartment = localStorage.getItem('selectedDepartment');
-            if (savedDepartment) {
-                currentDepartment = savedDepartment;
-            }
-            
             // Mostrar estado de conexión
             syncStatus.style.display = 'block';
             syncStatusText.textContent = 'Conectando con la base de datos...';
@@ -1533,37 +1600,20 @@
             // Configurar event listeners
             setupEventListeners();
             
-            // Manejar vista basada en hash de URL
-            const hash = window.location.hash.substring(1);
-            if (currentDepartment && hash === 'announcements') {
-                document.getElementById('currentDepartmentTitle').textContent = `Anuncios: ${currentDepartment}`;
-                showView('announcements');
-            } else if (hash === 'admin' && isAdminLoggedIn) {
-                showView('admin');
-            } else {
-                // Mostrar vista inicial
-                showView('departmentSelection');
-            }
-            
-            isInitialLoad = false;
-            
-            // Escuchar cambios en el hash de URL
-            window.addEventListener('hashchange', handleHashChange);
+            // Mostrar vista inicial
+            showView('departmentSelection');
         }
 
-        // Manejar cambios en el hash de URL
-        function handleHashChange() {
-            if (isInitialLoad) return;
-            
-            const hash = window.location.hash.substring(1);
-            if (hash === 'announcements' && currentDepartment) {
-                document.getElementById('currentDepartmentTitle').textContent = `Anuncios: ${currentDepartment}`;
-                showView('announcements');
-            } else if (hash === 'admin' && isAdminLoggedIn) {
-                showView('admin');
-            } else {
-                showView('departmentSelection');
-            }
+        // Mostrar overlay de carga
+        function showLoadingOverlay(title = 'Cargando...', message = 'Por favor espera mientras se actualiza la página.') {
+            loadingTitle.textContent = title;
+            loadingMessage.textContent = message;
+            loadingOverlay.classList.add('active');
+        }
+
+        // Ocultar overlay de carga
+        function hideLoadingOverlay() {
+            loadingOverlay.classList.remove('active');
         }
 
         // Actualizar estado de conexión
@@ -1749,23 +1799,23 @@
             
             // Botones de navegación
             backToDepartmentsBtn.addEventListener('click', () => {
-                showView('departmentSelection');
+                handleReturnToDepartments();
             });
             
             backToJuvenilBtn.addEventListener('click', () => {
-                showView('juvenil');
+                handleReturnToDepartments();
             });
             
             backToSelectionBtn.addEventListener('click', () => {
-                goBack();
+                handleReturnToDepartments();
             });
             
             backToAnnouncementsBtn.addEventListener('click', () => {
-                goBack();
+                handleReturnToDepartments();
             });
             
             backToMainFromAdminBtn.addEventListener('click', () => {
-                showView('departmentSelection');
+                handleReturnToDepartments();
             });
             
             // Enviar formulario de anuncio
@@ -1832,30 +1882,19 @@
             });
         }
 
-        // Función para volver atrás
-        function goBack() {
-            if (announcementFormSection.classList.contains('active')) {
-                // Si estamos en formulario, volver a anuncios
-                showView('announcements');
-            } else if (announcementsSection.classList.contains('active')) {
-                // Si estamos en anuncios, volver a selección
-                if (currentDepartment === "JA") {
-                    showView('juvenil');
-                } else if (["Aventureros", "Conquistadores", "Guías Mayores"].includes(currentDepartment)) {
-                    showView('clubes');
-                } else {
-                    showView('departmentSelection');
-                }
-            } else if (clubesSelection.style.display === 'block') {
-                // Si estamos en clubes, volver a juvenil
-                showView('juvenil');
-            } else if (juvenilSelection.style.display === 'block') {
-                // Si estamos en juvenil, volver a departamentos
-                showView('departmentSelection');
-            } else if (adminPanel.classList.contains('active')) {
-                // Si estamos en admin, volver a departamentos
-                showView('departmentSelection');
-            }
+        // Manejar retorno a departamentos
+        function handleReturnToDepartments() {
+            showLoadingOverlay('Actualizando...', 'Preparando la selección de departamentos...');
+            
+            // Limpiar estado actual
+            currentDepartment = null;
+            announcements = [];
+            
+            // Esperar 2 segundos y luego recargar
+            setTimeout(() => {
+                sessionStorage.setItem('needsReload', 'true');
+                window.location.reload();
+            }, 2000);
         }
 
         // Manejar login de administrador
@@ -1914,39 +1953,21 @@
             if (view === 'departmentSelection') {
                 departmentSelection.style.display = 'block';
                 document.getElementById('welcomeMessage').style.display = 'block';
-                // Limpiar el departamento seleccionado cuando volvemos a la selección
-                localStorage.removeItem('selectedDepartment');
-                currentDepartment = null;
-                window.location.hash = '';
             } else if (view === 'juvenil') {
                 juvenilSelection.style.display = 'block';
-                // Limpiar departamento si estamos en selección
-                localStorage.removeItem('selectedDepartment');
-                currentDepartment = null;
-                window.location.hash = '';
             } else if (view === 'clubes') {
                 clubesSelection.style.display = 'block';
-                // Limpiar departamento si estamos en selección
-                localStorage.removeItem('selectedDepartment');
-                currentDepartment = null;
-                window.location.hash = '';
             } else if (view === 'form') {
                 announcementFormSection.classList.add('active');
                 document.getElementById('formSectionTitle').textContent = `Crear Anuncio para: ${currentDepartment}`;
                 document.getElementById('selectedDepartment').value = currentDepartment;
-                window.location.hash = 'form';
             } else if (view === 'announcements') {
                 announcementsSection.classList.add('active');
-                // Asegurarnos de que el título sea correcto
-                if (currentDepartment) {
-                    document.getElementById('currentDepartmentTitle').textContent = `Anuncios: ${currentDepartment}`;
-                }
+                document.getElementById('currentDepartmentTitle').textContent = `Anuncios: ${currentDepartment}`;
                 renderAnnouncements();
-                window.location.hash = 'announcements';
             } else if (view === 'admin') {
                 adminPanel.classList.add('active');
                 renderAdminAnnouncements();
-                window.location.hash = 'admin';
             }
         }
 
@@ -1975,8 +1996,6 @@
         // Seleccionar un departamento
         function selectDepartment(department) {
             currentDepartment = department;
-            // Guardar en LocalStorage
-            localStorage.setItem('selectedDepartment', department);
             document.getElementById('currentDepartmentTitle').textContent = `Anuncios: ${department}`;
             showView('announcements');
         }
@@ -2057,13 +2076,12 @@
                     '📢'
                 );
                 
-                // Recargar la página después de 2 segundos
+                // Mostrar overlay de carga y recargar después de 2 segundos
                 setTimeout(() => {
-                    // Limpiar hash de URL y departamento seleccionado
-                    window.location.hash = '';
-                    localStorage.removeItem('selectedDepartment');
-                    currentDepartment = null;
-                    window.location.reload();
+                    showLoadingOverlay('Actualizando...', 'La página se está recargando para mostrar tu anuncio...');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
                 }, 2000);
                 
             } else {
@@ -2133,13 +2151,12 @@
                         '✏️'
                     );
                     
-                    // Recargar la página después de 2 segundos
+                    // Mostrar overlay de carga y recargar después de 2 segundos
                     setTimeout(() => {
-                        // Limpiar hash de URL y departamento seleccionado
-                        window.location.hash = '';
-                        localStorage.removeItem('selectedDepartment');
-                        currentDepartment = null;
-                        window.location.reload();
+                        showLoadingOverlay('Actualizando...', 'La página se está recargando para mostrar los cambios...');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
                     }, 2000);
                     
                 } else {
@@ -2205,13 +2222,12 @@
                         '🗑️'
                     );
                     
-                    // Recargar la página después de 2 segundos
+                    // Mostrar overlay de carga y recargar después de 2 segundos
                     setTimeout(() => {
-                        // Limpiar hash de URL y departamento seleccionado
-                        window.location.hash = '';
-                        localStorage.removeItem('selectedDepartment');
-                        currentDepartment = null;
-                        window.location.reload();
+                        showLoadingOverlay('Actualizando...', 'La página se está recargando para actualizar la lista de anuncios...');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
                     }, 2000);
                     
                 } else {
@@ -2222,24 +2238,14 @@
 
         // Renderizar anuncios del departamento actual
         function renderAnnouncements() {
-            const emptyMessage = document.getElementById('emptyMessage');
-            const announcementsContainer = document.getElementById('announcementsContainer');
-            
-            // Si no hay departamento seleccionado, mostrar mensaje
-            if (!currentDepartment) {
-                emptyMessage.textContent = 'Por favor selecciona un departamento primero.';
-                emptyMessage.style.display = 'block';
-                announcementsContainer.innerHTML = '';
-                announcementsContainer.appendChild(emptyMessage);
-                return;
-            }
-            
             // Filtrar anuncios del departamento actual
             let departmentAnnouncements = announcements.filter(ann => ann.department === currentDepartment);
             
             // Mostrar mensaje si no hay anuncios
+            const emptyMessage = document.getElementById('emptyMessage');
+            const announcementsContainer = document.getElementById('announcementsContainer');
+            
             if (departmentAnnouncements.length === 0) {
-                emptyMessage.textContent = `No hay anuncios para ${currentDepartment}. ¡Crea el primer anuncio!`;
                 emptyMessage.style.display = 'block';
                 announcementsContainer.innerHTML = '';
                 announcementsContainer.appendChild(emptyMessage);
