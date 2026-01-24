@@ -444,6 +444,149 @@
             background-color: #1d4ed8;
         }
         
+        /* Área de carga de archivos */
+        .file-upload-container {
+            grid-column: 1 / -1;
+            margin-top: 1rem;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed var(--gris);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s, background-color 0.3s;
+            background-color: var(--gris-claro);
+        }
+        
+        .file-upload-area:hover {
+            border-color: var(--azul-secundario);
+            background-color: var(--azul-claro);
+        }
+        
+        .file-upload-area.drag-over {
+            border-color: var(--verde);
+            background-color: #dcfce7;
+        }
+        
+        .file-upload-icon {
+            font-size: 3rem;
+            color: var(--gris);
+            margin-bottom: 1rem;
+        }
+        
+        .file-upload-area:hover .file-upload-icon {
+            color: var(--azul-principal);
+        }
+        
+        .file-upload-text {
+            margin-bottom: 1rem;
+            color: var(--gris-oscuro);
+        }
+        
+        .file-input-label {
+            background-color: var(--azul-secundario);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+        
+        .file-input-label:hover {
+            background-color: #2563eb;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-preview {
+            margin-top: 1.5rem;
+        }
+        
+        .file-preview h4 {
+            color: var(--azul-principal);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .file-info {
+            background-color: var(--gris-claro);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: var(--gris-oscuro);
+        }
+        
+        .file-size {
+            font-size: 0.85rem;
+            color: var(--gris);
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .file-action-btn {
+            background: none;
+            border: 1px solid var(--gris);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.3s;
+        }
+        
+        .file-action-btn:hover {
+            background-color: var(--gris-claro);
+        }
+        
+        .file-action-btn.download {
+            background-color: var(--verde);
+            color: white;
+            border-color: var(--verde);
+        }
+        
+        .file-action-btn.download:hover {
+            background-color: #0da271;
+        }
+        
+        .file-preview-content {
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow: auto;
+            border: 1px solid var(--gris);
+            border-radius: 8px;
+            padding: 1rem;
+            background-color: white;
+        }
+        
+        .image-preview {
+            max-width: 100%;
+            max-height: 250px;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .file-type-icon {
+            font-size: 2rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
         /* Sección para mostrar anuncios */
         .announcements-section {
             background-color: var(--blanco);
@@ -532,6 +675,60 @@
             margin-top: 0.8rem;
             padding-top: 0.5rem;
             border-top: 1px dashed var(--gris);
+        }
+        
+        /* Archivos adjuntos en anuncios */
+        .announcement-attachments {
+            margin-top: 1rem;
+            padding-top: 0.8rem;
+            border-top: 1px dashed var(--gris);
+        }
+        
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background-color: white;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--gris-claro);
+        }
+        
+        .attachment-icon {
+            font-size: 1.2rem;
+            color: var(--azul-principal);
+        }
+        
+        .attachment-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .attachment-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .attachment-size {
+            font-size: 0.75rem;
+            color: var(--gris);
+        }
+        
+        .attachment-download {
+            background: none;
+            border: none;
+            color: var(--azul-secundario);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.2rem;
+        }
+        
+        .attachment-download:hover {
+            color: var(--azul-principal);
         }
         
         /* Botones de acción */
@@ -1001,6 +1198,25 @@
                 padding: 0.6rem;
             }
             
+            /* Área de carga de archivos responsive */
+            .file-upload-area {
+                padding: 1.5rem;
+            }
+            
+            .file-upload-icon {
+                font-size: 2.5rem;
+            }
+            
+            .file-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .file-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
             .success-modal-content {
                 padding: 1.5rem;
                 margin: 1rem;
@@ -1067,6 +1283,23 @@
             .welcome-message p {
                 font-size: 0.9rem;
             }
+            
+            .file-upload-area {
+                padding: 1rem;
+            }
+            
+            .file-upload-icon {
+                font-size: 2rem;
+            }
+            
+            .file-upload-text {
+                font-size: 0.9rem;
+            }
+            
+            .file-input-label {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
+            }
         }
         
         @media (max-width: 360px) {
@@ -1089,6 +1322,14 @@
             .login-btn, .logout-btn, .admin-view-btn, .back-btn {
                 padding: 0.4rem 0.8rem;
                 font-size: 0.8rem;
+            }
+            
+            .file-upload-area {
+                padding: 0.8rem;
+            }
+            
+            .file-upload-text {
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -1361,8 +1602,8 @@
             <form id="announcementForm" class="announcement-form">
                 <input type="hidden" id="selectedDepartment">
                 <div class="form-control">
-                    <label for="time">Hora de inicio:</label>
-                    <input type="time" id="time" required>
+                    <label for="time">Hora de inicio (opcional):</label>
+                    <input type="time" id="time">
                 </div>
                 <div class="form-control">
                     <label for="endTime">Hora de fin (opcional):</label>
@@ -1388,6 +1629,49 @@
                     <label for="description">Descripción:</label>
                     <textarea id="description" placeholder="Describe los detalles del anuncio..." required></textarea>
                 </div>
+                
+                <!-- Área de carga de archivos -->
+                <div class="file-upload-container">
+                    <label for="fileUpload" style="margin-bottom: 0.8rem; display: block; font-weight: 500; font-size: 0.9rem;">
+                        Subir archivo (opcional):
+                        <span style="font-size: 0.8rem; color: var(--gris); font-weight: normal;">
+                            Puedes subir una imagen, PDF, Excel, Word o PowerPoint
+                        </span>
+                    </label>
+                    <div class="file-upload-area" id="fileUploadArea">
+                        <div class="file-upload-icon">📎</div>
+                        <div class="file-upload-text">
+                            Arrastra y suelta un archivo aquí o haz clic para seleccionarlo
+                        </div>
+                        <label for="fileUpload" class="file-input-label">
+                            Seleccionar archivo
+                        </label>
+                        <input type="file" id="fileUpload" class="file-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+                    </div>
+                    
+                    <!-- Vista previa del archivo -->
+                    <div class="file-preview" id="filePreviewContainer" style="display: none;">
+                        <h4>Archivo seleccionado:</h4>
+                        <div class="file-info" id="fileInfo">
+                            <div>
+                                <div class="file-name" id="fileName"></div>
+                                <div class="file-size" id="fileSize"></div>
+                            </div>
+                            <div class="file-actions">
+                                <button type="button" class="file-action-btn download" id="downloadPreviewBtn">
+                                    📥 Descargar
+                                </button>
+                                <button type="button" class="file-action-btn" id="removeFileBtn">
+                                    ✖️ Quitar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="file-preview-content" id="filePreviewContent">
+                            <!-- La vista previa se mostrará aquí -->
+                        </div>
+                    </div>
+                </div>
+                
                 <button type="submit" class="btn-submit-announcement" id="submitAnnouncementBtn">
                     <span id="submitBtnText">Publicar Anuncio</span>
                     <span id="submitLoading" class="loading" style="display: none;"></span>
@@ -1461,8 +1745,8 @@
                         <input type="text" id="editDepartment" readonly style="background-color: #f3f4f6;">
                     </div>
                     <div class="form-control">
-                        <label for="editTime">Hora de inicio:</label>
-                        <input type="time" id="editTime" required>
+                        <label for="editTime">Hora de inicio (opcional):</label>
+                        <input type="time" id="editTime">
                     </div>
                     <div class="form-control">
                         <label for="editEndTime">Hora de fin (opcional):</label>
@@ -1531,6 +1815,7 @@
         let lastView = 'departmentSelection';
         let isProcessing = false;
         let needsReload = false;
+        let currentFile = null;
 
         // Elementos del DOM
         const loginBtn = document.getElementById('loginBtn');
@@ -1565,6 +1850,47 @@
         const loadingOverlay = document.getElementById('loadingOverlay');
         const loadingTitle = document.getElementById('loadingTitle');
         const loadingMessage = document.getElementById('loadingMessage');
+        const fileUpload = document.getElementById('fileUpload');
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const filePreviewContainer = document.getElementById('filePreviewContainer');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const filePreviewContent = document.getElementById('filePreviewContent');
+        const downloadPreviewBtn = document.getElementById('downloadPreviewBtn');
+        const removeFileBtn = document.getElementById('removeFileBtn');
+
+        // Función para convertir hora de 24h a 12h con AM/PM
+        function convertTo12Hour(time) {
+            if (!time) return '';
+            
+            const [hours, minutes] = time.split(':');
+            let hour = parseInt(hours);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            
+            hour = hour % 12;
+            hour = hour === 0 ? 12 : hour;
+            
+            return `${hour}:${minutes} ${ampm}`;
+        }
+
+        // Función para formatear tamaño de archivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Función para obtener icono según tipo de archivo
+        function getFileIcon(fileType) {
+            if (fileType.startsWith('image/')) return '🖼️';
+            if (fileType === 'application/pdf') return '📄';
+            if (fileType.includes('word') || fileType.includes('document')) return '📝';
+            if (fileType.includes('excel') || fileType.includes('spreadsheet')) return '📊';
+            if (fileType.includes('powerpoint') || fileType.includes('presentation')) return '📽️';
+            return '📎';
+        }
 
         // Inicializar la aplicación
         function initApp() {
@@ -1763,8 +2089,143 @@
             successModal.classList.add('active');
         }
 
+        // Configurar event listeners para archivos
+        function setupFileEventListeners() {
+            // Drag & drop
+            fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.add('drag-over');
+            });
+
+            fileUploadArea.addEventListener('dragleave', () => {
+                fileUploadArea.classList.remove('drag-over');
+            });
+
+            fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.remove('drag-over');
+                
+                if (e.dataTransfer.files.length) {
+                    const file = e.dataTransfer.files[0];
+                    handleFileSelection(file);
+                }
+            });
+
+            // Click para seleccionar archivo
+            fileUploadArea.addEventListener('click', () => {
+                fileUpload.click();
+            });
+
+            // Cambio en el input de archivo
+            fileUpload.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    const file = e.target.files[0];
+                    handleFileSelection(file);
+                }
+            });
+
+            // Botón para quitar archivo
+            removeFileBtn.addEventListener('click', () => {
+                currentFile = null;
+                filePreviewContainer.style.display = 'none';
+                fileUpload.value = '';
+            });
+
+            // Botón para descargar vista previa
+            downloadPreviewBtn.addEventListener('click', () => {
+                if (currentFile) {
+                    const url = URL.createObjectURL(currentFile);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = currentFile.name;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }
+            });
+        }
+
+        // Manejar selección de archivo
+        function handleFileSelection(file) {
+            // Validar tamaño (max 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                showMessage('El archivo es demasiado grande. El tamaño máximo es 5MB.', 'error');
+                return;
+            }
+
+            // Validar tipo de archivo
+            const validTypes = [
+                'image/jpeg',
+                'image/png',
+                'image/gif',
+                'image/webp',
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            ];
+
+            if (!validTypes.includes(file.type)) {
+                showMessage('Tipo de archivo no permitido. Solo se permiten imágenes, PDF, Word, Excel y PowerPoint.', 'error');
+                return;
+            }
+
+            currentFile = file;
+            
+            // Mostrar información del archivo
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            
+            // Mostrar vista previa
+            showFilePreview(file);
+            
+            // Mostrar contenedor de vista previa
+            filePreviewContainer.style.display = 'block';
+        }
+
+        // Mostrar vista previa del archivo
+        function showFilePreview(file) {
+            filePreviewContent.innerHTML = '';
+            
+            if (file.type.startsWith('image/')) {
+                // Vista previa para imágenes
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'image-preview';
+                    filePreviewContent.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // Icono para otros tipos de archivos
+                const icon = document.createElement('div');
+                icon.className = 'file-type-icon';
+                icon.textContent = getFileIcon(file.type);
+                
+                const info = document.createElement('div');
+                info.style.textAlign = 'center';
+                info.innerHTML = `
+                    <p><strong>${file.name}</strong></p>
+                    <p style="color: var(--gris); font-size: 0.9rem;">${file.type}</p>
+                    <p style="color: var(--gris); font-size: 0.9rem;">${formatFileSize(file.size)}</p>
+                `;
+                
+                filePreviewContent.appendChild(icon);
+                filePreviewContent.appendChild(info);
+            }
+        }
+
         // Configurar event listeners
         function setupEventListeners() {
+            // Configurar event listeners para archivos
+            setupFileEventListeners();
+            
             // Toggle formulario de login
             loginBtn.addEventListener('click', () => {
                 loginForm.classList.toggle('active');
@@ -2038,7 +2499,7 @@
             
             // Obtener valores del formulario
             const department = document.getElementById('selectedDepartment').value;
-            const time = document.getElementById('time').value;
+            const time = document.getElementById('time').value || null;
             const endTime = document.getElementById('endTime').value || null;
             const title = document.getElementById('title').value.trim();
             const description = document.getElementById('description').value.trim();
@@ -2047,7 +2508,7 @@
             const author = document.getElementById('author').value.trim();
             
             // Validar campos
-            if (!time || !title || !description || !date || !author) {
+            if (!title || !description || !date || !author) {
                 showMessage('Por favor completa todos los campos obligatorios.', 'error');
                 isProcessing = false;
                 return;
@@ -2075,41 +2536,98 @@
                 updatedAt: new Date().toISOString()
             };
             
-            // Intentar guardar en Firebase
-            const firebaseSuccess = await saveAnnouncementToFirebase(newAnnouncement);
-            
-            // Restaurar botón
-            document.getElementById('submitBtnText').textContent = 'Publicar Anuncio';
-            document.getElementById('submitLoading').style.display = 'none';
-            document.getElementById('submitAnnouncementBtn').disabled = false;
-            isProcessing = false;
-            
-            if (firebaseSuccess) {
-                // Limpiar formulario (excepto el nombre del autor)
-                document.getElementById('time').value = '';
-                document.getElementById('endTime').value = '';
-                document.getElementById('title').value = '';
-                document.getElementById('date').value = '';
-                document.getElementById('endDate').value = '';
-                document.getElementById('description').value = '';
+            // Procesar archivo si existe
+            if (currentFile) {
+                // Convertir archivo a base64 para almacenar en Firebase
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    newAnnouncement.file = {
+                        name: currentFile.name,
+                        type: currentFile.type,
+                        size: currentFile.size,
+                        data: e.target.result.split(',')[1], // Remover el prefijo data:...
+                        uploadedAt: new Date().toISOString()
+                    };
+                    
+                    // Intentar guardar en Firebase
+                    const firebaseSuccess = await saveAnnouncementToFirebase(newAnnouncement);
+                    
+                    // Restaurar botón
+                    document.getElementById('submitBtnText').textContent = 'Publicar Anuncio';
+                    document.getElementById('submitLoading').style.display = 'none';
+                    document.getElementById('submitAnnouncementBtn').disabled = false;
+                    isProcessing = false;
+                    
+                    if (firebaseSuccess) {
+                        // Limpiar formulario (excepto el nombre del autor)
+                        document.getElementById('time').value = '';
+                        document.getElementById('endTime').value = '';
+                        document.getElementById('title').value = '';
+                        document.getElementById('date').value = '';
+                        document.getElementById('endDate').value = '';
+                        document.getElementById('description').value = '';
+                        filePreviewContainer.style.display = 'none';
+                        fileUpload.value = '';
+                        currentFile = null;
+                        
+                        // Mostrar modal de éxito
+                        showSuccessModal(
+                            '¡Anuncio Publicado!', 
+                            'Tu anuncio se ha publicado exitosamente. La página se recargará automáticamente.',
+                            '📢'
+                        );
+                        
+                        // Mostrar overlay de carga y recargar después de 2 segundos
+                        setTimeout(() => {
+                            showLoadingOverlay('Actualizando...', 'La página se está recargando para mostrar tu anuncio...');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
+                        }, 2000);
+                        
+                    } else {
+                        showMessage('Error al publicar el anuncio. Intenta nuevamente.', 'error');
+                    }
+                };
                 
-                // Mostrar modal de éxito
-                showSuccessModal(
-                    '¡Anuncio Publicado!', 
-                    'Tu anuncio se ha publicado exitosamente. La página se recargará automáticamente.',
-                    '📢'
-                );
-                
-                // Mostrar overlay de carga y recargar después de 2 segundos
-                setTimeout(() => {
-                    showLoadingOverlay('Actualizando...', 'La página se está recargando para mostrar tu anuncio...');
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
-                }, 2000);
-                
+                reader.readAsDataURL(currentFile);
             } else {
-                showMessage('Error al publicar el anuncio. Intenta nuevamente.', 'error');
+                // No hay archivo, guardar directamente
+                const firebaseSuccess = await saveAnnouncementToFirebase(newAnnouncement);
+                
+                // Restaurar botón
+                document.getElementById('submitBtnText').textContent = 'Publicar Anuncio';
+                document.getElementById('submitLoading').style.display = 'none';
+                document.getElementById('submitAnnouncementBtn').disabled = false;
+                isProcessing = false;
+                
+                if (firebaseSuccess) {
+                    // Limpiar formulario (excepto el nombre del autor)
+                    document.getElementById('time').value = '';
+                    document.getElementById('endTime').value = '';
+                    document.getElementById('title').value = '';
+                    document.getElementById('date').value = '';
+                    document.getElementById('endDate').value = '';
+                    document.getElementById('description').value = '';
+                    
+                    // Mostrar modal de éxito
+                    showSuccessModal(
+                        '¡Anuncio Publicado!', 
+                        'Tu anuncio se ha publicado exitosamente. La página se recargará automáticamente.',
+                        '📢'
+                    );
+                    
+                    // Mostrar overlay de carga y recargar después de 2 segundos
+                    setTimeout(() => {
+                        showLoadingOverlay('Actualizando...', 'La página se está recargando para mostrar tu anuncio...');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    }, 2000);
+                    
+                } else {
+                    showMessage('Error al publicar el anuncio. Intenta nuevamente.', 'error');
+                }
             }
         }
 
@@ -2122,7 +2640,7 @@
             
             // Obtener valores del formulario
             const id = parseInt(document.getElementById('editId').value);
-            const time = document.getElementById('editTime').value;
+            const time = document.getElementById('editTime').value || null;
             const endTime = document.getElementById('editEndTime').value || null;
             const title = document.getElementById('editTitle').value.trim();
             const description = document.getElementById('editDescription').value.trim();
@@ -2131,7 +2649,7 @@
             const author = document.getElementById('editAuthorDisplay').value.trim();
             
             // Validar campos
-            if (!time || !title || !description || !date || !author) {
+            if (!title || !description || !date || !author) {
                 showMessage('Por favor completa todos los campos obligatorios.', 'error');
                 isProcessing = false;
                 return;
@@ -2209,7 +2727,7 @@
                 document.getElementById('editId').value = announcement.id;
                 document.getElementById('editAuthorDisplay').value = announcement.author;
                 document.getElementById('editDepartment').value = announcement.department;
-                document.getElementById('editTime').value = announcement.time;
+                document.getElementById('editTime').value = announcement.time || '';
                 document.getElementById('editEndTime').value = announcement.endTime || '';
                 document.getElementById('editTitle').value = announcement.title;
                 document.getElementById('editDate').value = announcement.date;
@@ -2303,19 +2821,43 @@
                     minute: '2-digit'
                 });
                 
+                // Convertir horas a formato 12h
+                const startTime = announcement.time ? convertTo12Hour(announcement.time) : 'No especificada';
+                const endTime = announcement.endTime ? convertTo12Hour(announcement.endTime) : null;
+                
+                // Generar HTML para archivos adjuntos
+                let attachmentsHTML = '';
+                if (announcement.file) {
+                    attachmentsHTML = `
+                        <div class="announcement-attachments">
+                            <div class="attachment-item">
+                                <div class="attachment-icon">${getFileIcon(announcement.file.type)}</div>
+                                <div class="attachment-info">
+                                    <div class="attachment-name">${announcement.file.name}</div>
+                                    <div class="attachment-size">${formatFileSize(announcement.file.size)}</div>
+                                </div>
+                                <button class="attachment-download" onclick="downloadFile(${announcement.id})" title="Descargar archivo">
+                                    ⬇️
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+                
                 announcementsHTML += `
                     <div class="announcement-card" id="announcement-${announcement.id}">
                         <h3>${announcement.title}</h3>
                         <div class="announcement-category">${announcement.department}</div>
                         <div class="announcement-meta">
-                            <span><strong>Hora de inicio:</strong> ${announcement.time}</span>
-                            ${announcement.endTime ? `<span><strong>Hora de fin:</strong> ${announcement.endTime}</span>` : ''}
+                            <span><strong>Hora de inicio:</strong> ${startTime}</span>
+                            ${endTime ? `<span><strong>Hora de fin:</strong> ${endTime}</span>` : ''}
                             <span><strong>Fecha de inicio:</strong> ${announcement.date}</span>
                             ${announcement.endDate ? `<span><strong>Fecha de fin:</strong> ${announcement.endDate}</span>` : ''}
                         </div>
                         <div class="announcement-description">
                             ${announcement.description}
                         </div>
+                        ${attachmentsHTML}
                         <div class="announcement-author">
                             <strong>Publicado por:</strong> ${announcement.author}
                             <span style="font-size: 0.7rem; color: #666; display: block; margin-top: 0.2rem;">
@@ -2327,6 +2869,29 @@
             });
             
             announcementsContainer.innerHTML = announcementsHTML;
+        }
+
+        // Función para descargar archivo adjunto
+        function downloadFile(announcementId) {
+            const announcement = announcements.find(ann => ann.id === announcementId);
+            if (announcement && announcement.file) {
+                const byteCharacters = atob(announcement.file.data);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: announcement.file.type });
+                
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = announcement.file.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
         }
 
         // Renderizar todos los anuncios en el panel de administrador
@@ -2366,6 +2931,26 @@
                     minute: '2-digit'
                 });
                 
+                // Convertir horas a formato 12h
+                const startTime = announcement.time ? convertTo12Hour(announcement.time) : 'No especificada';
+                const endTime = announcement.endTime ? convertTo12Hour(announcement.endTime) : null;
+                
+                // Generar HTML para archivos adjuntos
+                let attachmentsHTML = '';
+                if (announcement.file) {
+                    attachmentsHTML = `
+                        <div class="announcement-attachments">
+                            <div class="attachment-item">
+                                <div class="attachment-icon">${getFileIcon(announcement.file.type)}</div>
+                                <div class="attachment-info">
+                                    <div class="attachment-name">${announcement.file.name}</div>
+                                    <div class="attachment-size">${formatFileSize(announcement.file.size)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
                 adminAnnouncementsHTML += `
                     <div class="announcement-card" id="admin-announcement-${announcement.id}">
                         <div class="announcement-actions">
@@ -2379,14 +2964,15 @@
                         <h3>${announcement.title}</h3>
                         <div class="announcement-category">${announcement.department}</div>
                         <div class="announcement-meta">
-                            <span><strong>Hora de inicio:</strong> ${announcement.time}</span>
-                            ${announcement.endTime ? `<span><strong>Hora de fin:</strong> ${announcement.endTime}</span>` : ''}
+                            <span><strong>Hora de inicio:</strong> ${startTime}</span>
+                            ${endTime ? `<span><strong>Hora de fin:</strong> ${endTime}</span>` : ''}
                             <span><strong>Fecha de inicio:</strong> ${announcement.date}</span>
                             ${announcement.endDate ? `<span><strong>Fecha de fin:</strong> ${announcement.endDate}</span>` : ''}
                         </div>
                         <div class="announcement-description">
                             ${announcement.description}
                         </div>
+                        ${attachmentsHTML}
                         <div class="announcement-author">
                             <strong>Publicado por:</strong> ${announcement.author}
                             <span style="font-size: 0.7rem; color: #666;">
