@@ -503,31 +503,54 @@
             display: none;
         }
         
-        .file-preview {
+        .files-list {
             margin-top: 1.5rem;
         }
         
-        .file-preview h4 {
+        .files-list h4 {
             color: var(--azul-principal);
             margin-bottom: 0.5rem;
             font-size: 1rem;
         }
         
-        .file-info {
+        .file-item {
             background-color: var(--gris-claro);
-            padding: 1rem;
+            padding: 0.8rem;
             border-radius: 8px;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 0.5rem;
+            border: 1px solid var(--gris-claro);
+            transition: border-color 0.3s;
+        }
+        
+        .file-item:hover {
+            border-color: var(--azul-secundario);
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+        
+        .file-icon {
+            font-size: 1.2rem;
+            color: var(--azul-principal);
+        }
+        
+        .file-details {
+            flex: 1;
         }
         
         .file-name {
             font-weight: 500;
             color: var(--gris-oscuro);
+            word-break: break-all;
         }
         
         .file-size {
@@ -535,56 +558,35 @@
             color: var(--gris);
         }
         
-        .file-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .file-action-btn {
+        .file-remove {
             background: none;
-            border: 1px solid var(--gris);
-            padding: 0.3rem 0.6rem;
-            border-radius: 4px;
+            border: none;
+            color: var(--rojo);
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 1.2rem;
+            padding: 0.2rem;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
             transition: background-color 0.3s;
         }
         
-        .file-action-btn:hover {
-            background-color: var(--gris-claro);
+        .file-remove:hover {
+            background-color: rgba(239, 68, 68, 0.1);
         }
         
-        .file-action-btn.download {
-            background-color: var(--verde);
-            color: white;
-            border-color: var(--verde);
-        }
-        
-        .file-action-btn.download:hover {
-            background-color: #0da271;
-        }
-        
-        .file-preview-content {
-            margin-top: 1rem;
-            max-height: 300px;
-            overflow: auto;
-            border: 1px solid var(--gris);
-            border-radius: 8px;
-            padding: 1rem;
-            background-color: white;
-        }
-        
-        .image-preview {
-            max-width: 100%;
-            max-height: 250px;
-            display: block;
-            margin: 0 auto;
-        }
-        
-        .file-type-icon {
-            font-size: 2rem;
+        .file-success-message {
+            background-color: #dcfce7;
+            color: #166534;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
             text-align: center;
-            margin: 1rem 0;
+            display: none;
         }
         
         /* Sección para mostrar anuncios */
@@ -677,60 +679,6 @@
             border-top: 1px dashed var(--gris);
         }
         
-        /* Archivos adjuntos en anuncios */
-        .announcement-attachments {
-            margin-top: 1rem;
-            padding-top: 0.8rem;
-            border-top: 1px dashed var(--gris);
-        }
-        
-        .attachment-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            background-color: white;
-            border-radius: 4px;
-            margin-bottom: 0.5rem;
-            border: 1px solid var(--gris-claro);
-        }
-        
-        .attachment-icon {
-            font-size: 1.2rem;
-            color: var(--azul-principal);
-        }
-        
-        .attachment-info {
-            flex: 1;
-            overflow: hidden;
-        }
-        
-        .attachment-name {
-            font-size: 0.85rem;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .attachment-size {
-            font-size: 0.75rem;
-            color: var(--gris);
-        }
-        
-        .attachment-download {
-            background: none;
-            border: none;
-            color: var(--azul-secundario);
-            cursor: pointer;
-            font-size: 1.2rem;
-            padding: 0.2rem;
-        }
-        
-        .attachment-download:hover {
-            color: var(--azul-principal);
-        }
-        
         /* Botones de acción */
         .announcement-actions {
             position: absolute;
@@ -767,6 +715,11 @@
             color: white;
         }
         
+        .details-btn {
+            background-color: var(--morado);
+            color: white;
+        }
+        
         /* Panel de administrador */
         .admin-panel {
             background-color: var(--blanco);
@@ -785,6 +738,177 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1.2rem;
+        }
+        
+        /* Modal de detalles */
+        .details-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
+        }
+        
+        .details-modal.active {
+            display: flex;
+        }
+        
+        .details-content {
+            background-color: var(--blanco);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            border-radius: 12px;
+            box-shadow: var(--sombra);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .details-header {
+            background-color: var(--azul-principal);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .details-header h3 {
+            font-size: 1.3rem;
+            margin: 0;
+        }
+        
+        .details-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .details-close:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .details-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .details-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .details-section h4 {
+            color: var(--azul-principal);
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--azul-claro);
+            font-size: 1.1rem;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            min-width: 120px;
+            color: var(--gris-oscuro);
+        }
+        
+        .detail-value {
+            flex: 1;
+            color: var(--gris-oscuro);
+        }
+        
+        .file-preview-container {
+            margin-top: 1.5rem;
+        }
+        
+        .file-preview {
+            border: 1px solid var(--gris-claro);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            background-color: var(--gris-claro);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            display: block;
+            margin: 0 auto;
+            border-radius: 4px;
+        }
+        
+        .video-preview {
+            width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+        }
+        
+        .pdf-preview {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 4px;
+        }
+        
+        .no-preview {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gris);
+            font-size: 0.9rem;
+        }
+        
+        .preview-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .preview-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .preview-download-btn {
+            background-color: var(--verde);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .preview-download-btn:hover {
+            background-color: #0da271;
         }
         
         /* Panel de edición de anuncios */
@@ -1207,14 +1331,45 @@
                 font-size: 2.5rem;
             }
             
-            .file-info {
+            .file-item {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 0.8rem;
             }
             
-            .file-actions {
+            .file-info {
                 width: 100%;
-                justify-content: flex-end;
+            }
+            
+            .file-remove {
+                align-self: flex-end;
+            }
+            
+            /* Modal de detalles responsive */
+            .details-content {
+                width: 95%;
+                max-height: 85vh;
+            }
+            
+            .details-header {
+                padding: 1rem;
+            }
+            
+            .details-body {
+                padding: 1rem;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                gap: 0.3rem;
+            }
+            
+            .detail-label {
+                min-width: auto;
+            }
+            
+            .pdf-preview {
+                height: 300px;
             }
             
             .success-modal-content {
@@ -1299,6 +1454,10 @@
             .file-input-label {
                 padding: 0.4rem 0.8rem;
                 font-size: 0.85rem;
+            }
+            
+            .details-header h3 {
+                font-size: 1.1rem;
             }
         }
         
@@ -1633,41 +1792,32 @@
                 <!-- Área de carga de archivos -->
                 <div class="file-upload-container">
                     <label for="fileUpload" style="margin-bottom: 0.8rem; display: block; font-weight: 500; font-size: 0.9rem;">
-                        Subir archivo (opcional):
+                        Subir archivos (opcional):
                         <span style="font-size: 0.8rem; color: var(--gris); font-weight: normal;">
-                            Puedes subir una imagen, PDF, Excel, Word o PowerPoint
+                            Puedes subir imágenes, videos, PDF, Excel, Word o PowerPoint
                         </span>
                     </label>
                     <div class="file-upload-area" id="fileUploadArea">
                         <div class="file-upload-icon">📎</div>
                         <div class="file-upload-text">
-                            Arrastra y suelta un archivo aquí o haz clic para seleccionarlo
+                            Arrastra y suelta archivos aquí o haz clic para seleccionarlos
                         </div>
                         <label for="fileUpload" class="file-input-label">
-                            Seleccionar archivo
+                            Seleccionar archivos
                         </label>
-                        <input type="file" id="fileUpload" class="file-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+                        <input type="file" id="fileUpload" class="file-input" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" multiple>
                     </div>
                     
-                    <!-- Vista previa del archivo -->
-                    <div class="file-preview" id="filePreviewContainer" style="display: none;">
-                        <h4>Archivo seleccionado:</h4>
-                        <div class="file-info" id="fileInfo">
-                            <div>
-                                <div class="file-name" id="fileName"></div>
-                                <div class="file-size" id="fileSize"></div>
-                            </div>
-                            <div class="file-actions">
-                                <button type="button" class="file-action-btn download" id="downloadPreviewBtn">
-                                    📥 Descargar
-                                </button>
-                                <button type="button" class="file-action-btn" id="removeFileBtn">
-                                    ✖️ Quitar
-                                </button>
-                            </div>
-                        </div>
-                        <div class="file-preview-content" id="filePreviewContent">
-                            <!-- La vista previa se mostrará aquí -->
+                    <!-- Mensaje de éxito -->
+                    <div class="file-success-message" id="fileSuccessMessage">
+                        ✅ Archivo subido con éxito
+                    </div>
+                    
+                    <!-- Lista de archivos -->
+                    <div class="files-list" id="filesListContainer">
+                        <h4>Archivos seleccionados:</h4>
+                        <div id="filesList">
+                            <!-- Los archivos se mostrarán aquí -->
                         </div>
                     </div>
                 </div>
@@ -1687,7 +1837,7 @@
                     <li>Haz clic en "Publicar Anuncio" para guardar tu anuncio en la nube</li>
                     <li>Tu anuncio se sincronizará automáticamente con todos los dispositivos</li>
                     <li>El administrador podrá ver tu anuncio desde cualquier dispositivo</li>
-                    <li>El administrador puede editar o eliminar anuncios desde la vista de administrador</li>
+                    <li>El administrador puede ver, editar o eliminar anuncios desde la vista de administrador</li>
                 </ul>
             </div>
         </section>
@@ -1728,6 +1878,19 @@
             </div>
         </section>
     </main>
+
+    <!-- Modal de detalles para administrador -->
+    <div id="detailsModal" class="details-modal">
+        <div class="details-content">
+            <div class="details-header">
+                <h3>Detalles del Anuncio</h3>
+                <button id="closeDetailsBtn" class="details-close">×</button>
+            </div>
+            <div class="details-body" id="detailsBody">
+                <!-- Los detalles se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+    </div>
 
     <!-- Panel de edición de anuncios -->
     <div id="editPanel" class="edit-panel">
@@ -1815,7 +1978,7 @@
         let lastView = 'departmentSelection';
         let isProcessing = false;
         let needsReload = false;
-        let currentFile = null;
+        let selectedFiles = [];
 
         // Elementos del DOM
         const loginBtn = document.getElementById('loginBtn');
@@ -1852,16 +2015,16 @@
         const loadingMessage = document.getElementById('loadingMessage');
         const fileUpload = document.getElementById('fileUpload');
         const fileUploadArea = document.getElementById('fileUploadArea');
-        const filePreviewContainer = document.getElementById('filePreviewContainer');
-        const fileName = document.getElementById('fileName');
-        const fileSize = document.getElementById('fileSize');
-        const filePreviewContent = document.getElementById('filePreviewContent');
-        const downloadPreviewBtn = document.getElementById('downloadPreviewBtn');
-        const removeFileBtn = document.getElementById('removeFileBtn');
+        const filesList = document.getElementById('filesList');
+        const filesListContainer = document.getElementById('filesListContainer');
+        const fileSuccessMessage = document.getElementById('fileSuccessMessage');
+        const detailsModal = document.getElementById('detailsModal');
+        const closeDetailsBtn = document.getElementById('closeDetailsBtn');
+        const detailsBody = document.getElementById('detailsBody');
 
         // Función para convertir hora de 24h a 12h con AM/PM
         function convertTo12Hour(time) {
-            if (!time) return '';
+            if (!time) return 'No especificada';
             
             const [hours, minutes] = time.split(':');
             let hour = parseInt(hours);
@@ -1885,11 +2048,23 @@
         // Función para obtener icono según tipo de archivo
         function getFileIcon(fileType) {
             if (fileType.startsWith('image/')) return '🖼️';
+            if (fileType.startsWith('video/')) return '🎬';
             if (fileType === 'application/pdf') return '📄';
             if (fileType.includes('word') || fileType.includes('document')) return '📝';
             if (fileType.includes('excel') || fileType.includes('spreadsheet')) return '📊';
             if (fileType.includes('powerpoint') || fileType.includes('presentation')) return '📽️';
             return '📎';
+        }
+
+        // Función para obtener nombre del tipo de archivo
+        function getFileTypeName(fileType) {
+            if (fileType.startsWith('image/')) return 'Imagen';
+            if (fileType.startsWith('video/')) return 'Video';
+            if (fileType === 'application/pdf') return 'Documento PDF';
+            if (fileType.includes('word') || fileType.includes('document')) return 'Documento Word';
+            if (fileType.includes('excel') || fileType.includes('spreadsheet')) return 'Hoja de cálculo Excel';
+            if (fileType.includes('powerpoint') || fileType.includes('presentation')) return 'Presentación PowerPoint';
+            return 'Archivo';
         }
 
         // Inicializar la aplicación
@@ -2106,8 +2281,8 @@
                 fileUploadArea.classList.remove('drag-over');
                 
                 if (e.dataTransfer.files.length) {
-                    const file = e.dataTransfer.files[0];
-                    handleFileSelection(file);
+                    const files = Array.from(e.dataTransfer.files);
+                    handleFilesSelection(files);
                 }
             });
 
@@ -2119,106 +2294,123 @@
             // Cambio en el input de archivo
             fileUpload.addEventListener('change', (e) => {
                 if (e.target.files.length) {
-                    const file = e.target.files[0];
-                    handleFileSelection(file);
-                }
-            });
-
-            // Botón para quitar archivo
-            removeFileBtn.addEventListener('click', () => {
-                currentFile = null;
-                filePreviewContainer.style.display = 'none';
-                fileUpload.value = '';
-            });
-
-            // Botón para descargar vista previa
-            downloadPreviewBtn.addEventListener('click', () => {
-                if (currentFile) {
-                    const url = URL.createObjectURL(currentFile);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = currentFile.name;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
+                    const files = Array.from(e.target.files);
+                    handleFilesSelection(files);
                 }
             });
         }
 
-        // Manejar selección de archivo
-        function handleFileSelection(file) {
-            // Validar tamaño (max 5MB)
-            const maxSize = 5 * 1024 * 1024; // 5MB
-            if (file.size > maxSize) {
-                showMessage('El archivo es demasiado grande. El tamaño máximo es 5MB.', 'error');
-                return;
-            }
-
-            // Validar tipo de archivo
-            const validTypes = [
-                'image/jpeg',
-                'image/png',
-                'image/gif',
-                'image/webp',
-                'application/pdf',
-                'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                'application/vnd.ms-excel',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'application/vnd.ms-powerpoint',
-                'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-            ];
-
-            if (!validTypes.includes(file.type)) {
-                showMessage('Tipo de archivo no permitido. Solo se permiten imágenes, PDF, Word, Excel y PowerPoint.', 'error');
-                return;
-            }
-
-            currentFile = file;
+        // Manejar selección de archivos
+        function handleFilesSelection(files) {
+            let validFiles = [];
             
-            // Mostrar información del archivo
-            fileName.textContent = file.name;
-            fileSize.textContent = formatFileSize(file.size);
-            
-            // Mostrar vista previa
-            showFilePreview(file);
-            
-            // Mostrar contenedor de vista previa
-            filePreviewContainer.style.display = 'block';
-        }
+            files.forEach(file => {
+                // Validar tamaño (max 10MB)
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                if (file.size > maxSize) {
+                    showMessage(`El archivo "${file.name}" es demasiado grande. El tamaño máximo es 10MB.`, 'error');
+                    return;
+                }
 
-        // Mostrar vista previa del archivo
-        function showFilePreview(file) {
-            filePreviewContent.innerHTML = '';
+                // Validar tipo de archivo
+                const validTypes = [
+                    'image/jpeg',
+                    'image/png',
+                    'image/gif',
+                    'image/webp',
+                    'video/mp4',
+                    'video/mpeg',
+                    'video/ogg',
+                    'video/webm',
+                    'application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/vnd.ms-excel',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'application/vnd.ms-powerpoint',
+                    'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+                ];
+
+                if (!validTypes.includes(file.type)) {
+                    showMessage(`Tipo de archivo "${file.name}" no permitido.`, 'error');
+                    return;
+                }
+
+                validFiles.push(file);
+            });
             
-            if (file.type.startsWith('image/')) {
-                // Vista previa para imágenes
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'image-preview';
-                    filePreviewContent.appendChild(img);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                // Icono para otros tipos de archivos
-                const icon = document.createElement('div');
-                icon.className = 'file-type-icon';
-                icon.textContent = getFileIcon(file.type);
+            if (validFiles.length === 0) return;
+            
+            // Agregar archivos válidos a la lista
+            validFiles.forEach(file => {
+                // Verificar si ya existe un archivo con el mismo nombre
+                if (selectedFiles.some(f => f.name === file.name)) {
+                    // Buscar un nombre único
+                    let counter = 1;
+                    let originalName = file.name;
+                    let extension = originalName.split('.').pop();
+                    let nameWithoutExt = originalName.substring(0, originalName.lastIndexOf('.'));
+                    
+                    while (selectedFiles.some(f => f.name === file.name)) {
+                        file.name = `${nameWithoutExt} (${counter}).${extension}`;
+                        counter++;
+                    }
+                }
                 
-                const info = document.createElement('div');
-                info.style.textAlign = 'center';
-                info.innerHTML = `
-                    <p><strong>${file.name}</strong></p>
-                    <p style="color: var(--gris); font-size: 0.9rem;">${file.type}</p>
-                    <p style="color: var(--gris); font-size: 0.9rem;">${formatFileSize(file.size)}</p>
+                selectedFiles.push(file);
+            });
+            
+            // Mostrar mensaje de éxito
+            showFileSuccessMessage();
+            
+            // Actualizar la lista de archivos
+            updateFilesList();
+            
+            // Mostrar contenedor de lista de archivos
+            filesListContainer.style.display = 'block';
+        }
+
+        // Mostrar mensaje de éxito al subir archivo
+        function showFileSuccessMessage() {
+            fileSuccessMessage.style.display = 'block';
+            setTimeout(() => {
+                fileSuccessMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        // Actualizar lista de archivos
+        function updateFilesList() {
+            filesList.innerHTML = '';
+            
+            if (selectedFiles.length === 0) {
+                filesListContainer.style.display = 'none';
+                return;
+            }
+            
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-icon">${getFileIcon(file.type)}</div>
+                        <div class="file-details">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${getFileTypeName(file.type)} • ${formatFileSize(file.size)}</div>
+                        </div>
+                    </div>
+                    <button class="file-remove" data-index="${index}">✖</button>
                 `;
-                
-                filePreviewContent.appendChild(icon);
-                filePreviewContent.appendChild(info);
-            }
+                filesList.appendChild(fileItem);
+            });
+            
+            // Agregar event listeners a los botones de eliminar
+            document.querySelectorAll('.file-remove').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.getAttribute('data-index'));
+                    selectedFiles.splice(index, 1);
+                    updateFilesList();
+                });
+            });
         }
 
         // Configurar event listeners
@@ -2314,6 +2506,16 @@
                 }
             });
             
+            // Cerrar modal de detalles
+            closeDetailsBtn.addEventListener('click', closeDetailsModal);
+            
+            // Cerrar modal de detalles al hacer clic fuera
+            detailsModal.addEventListener('click', (e) => {
+                if (e.target === detailsModal) {
+                    closeDetailsModal();
+                }
+            });
+            
             // Cerrar modal de éxito
             closeSuccessModal.addEventListener('click', () => {
                 successModal.classList.remove('active');
@@ -2368,6 +2570,7 @@
             // Limpiar estado actual
             currentDepartment = null;
             announcements = [];
+            selectedFiles = [];
             
             // Esperar 2 segundos y luego recargar
             setTimeout(() => {
@@ -2536,20 +2739,28 @@
                 updatedAt: new Date().toISOString()
             };
             
-            // Procesar archivo si existe
-            if (currentFile) {
-                // Convertir archivo a base64 para almacenar en Firebase
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    newAnnouncement.file = {
-                        name: currentFile.name,
-                        type: currentFile.type,
-                        size: currentFile.size,
-                        data: e.target.result.split(',')[1], // Remover el prefijo data:...
-                        uploadedAt: new Date().toISOString()
-                    };
+            // Procesar archivos si existen
+            if (selectedFiles.length > 0) {
+                newAnnouncement.files = [];
+                
+                // Procesar cada archivo
+                const processFiles = async () => {
+                    for (const file of selectedFiles) {
+                        try {
+                            const fileData = await convertFileToBase64(file);
+                            newAnnouncement.files.push({
+                                name: file.name,
+                                type: file.type,
+                                size: file.size,
+                                data: fileData.split(',')[1], // Remover el prefijo data:...
+                                uploadedAt: new Date().toISOString()
+                            });
+                        } catch (error) {
+                            console.error("Error procesando archivo:", error);
+                        }
+                    }
                     
-                    // Intentar guardar en Firebase
+                    // Guardar en Firebase después de procesar todos los archivos
                     const firebaseSuccess = await saveAnnouncementToFirebase(newAnnouncement);
                     
                     // Restaurar botón
@@ -2559,16 +2770,8 @@
                     isProcessing = false;
                     
                     if (firebaseSuccess) {
-                        // Limpiar formulario (excepto el nombre del autor)
-                        document.getElementById('time').value = '';
-                        document.getElementById('endTime').value = '';
-                        document.getElementById('title').value = '';
-                        document.getElementById('date').value = '';
-                        document.getElementById('endDate').value = '';
-                        document.getElementById('description').value = '';
-                        filePreviewContainer.style.display = 'none';
-                        fileUpload.value = '';
-                        currentFile = null;
+                        // Limpiar formulario
+                        resetForm();
                         
                         // Mostrar modal de éxito
                         showSuccessModal(
@@ -2590,9 +2793,9 @@
                     }
                 };
                 
-                reader.readAsDataURL(currentFile);
+                processFiles();
             } else {
-                // No hay archivo, guardar directamente
+                // No hay archivos, guardar directamente
                 const firebaseSuccess = await saveAnnouncementToFirebase(newAnnouncement);
                 
                 // Restaurar botón
@@ -2602,13 +2805,8 @@
                 isProcessing = false;
                 
                 if (firebaseSuccess) {
-                    // Limpiar formulario (excepto el nombre del autor)
-                    document.getElementById('time').value = '';
-                    document.getElementById('endTime').value = '';
-                    document.getElementById('title').value = '';
-                    document.getElementById('date').value = '';
-                    document.getElementById('endDate').value = '';
-                    document.getElementById('description').value = '';
+                    // Limpiar formulario
+                    resetForm();
                     
                     // Mostrar modal de éxito
                     showSuccessModal(
@@ -2629,6 +2827,29 @@
                     showMessage('Error al publicar el anuncio. Intenta nuevamente.', 'error');
                 }
             }
+        }
+
+        // Convertir archivo a base64
+        function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Limpiar formulario
+        function resetForm() {
+            document.getElementById('time').value = '';
+            document.getElementById('endTime').value = '';
+            document.getElementById('title').value = '';
+            document.getElementById('date').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('description').value = '';
+            filesListContainer.style.display = 'none';
+            fileUpload.value = '';
+            selectedFiles = [];
         }
 
         // Manejar edición de anuncio
@@ -2750,6 +2971,209 @@
             document.getElementById('saveEditBtn').disabled = false;
         }
 
+        // Abrir modal de detalles
+        function openDetailsModal(id) {
+            // Buscar el anuncio
+            const announcement = announcements.find(ann => ann.id === id);
+            
+            if (announcement) {
+                // Formatear fechas
+                const createdDate = new Date(announcement.createdAt);
+                const updatedDate = new Date(announcement.updatedAt);
+                
+                const formattedCreatedDate = createdDate.toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const formattedUpdatedDate = updatedDate.toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                // Convertir horas a formato 12h
+                const startTime = announcement.time ? convertTo12Hour(announcement.time) : 'No especificada';
+                const endTime = announcement.endTime ? convertTo12Hour(announcement.endTime) : 'No especificada';
+                
+                // Generar contenido para archivos
+                let filesContent = '';
+                if (announcement.files && announcement.files.length > 0) {
+                    filesContent = `
+                        <div class="details-section">
+                            <h4>Archivos Adjuntos (${announcement.files.length})</h4>
+                            ${announcement.files.map((file, index) => `
+                                <div class="file-preview-container">
+                                    <div class="detail-row">
+                                        <div class="detail-label">Archivo ${index + 1}:</div>
+                                        <div class="detail-value">
+                                            ${getFileIcon(file.type)} ${file.name}
+                                            <span style="color: var(--gris); font-size: 0.9rem;">
+                                                (${getFileTypeName(file.type)} • ${formatFileSize(file.size)})
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="file-preview">
+                                        ${generateFilePreview(file)}
+                                    </div>
+                                    <div class="preview-actions">
+                                        <button class="preview-download-btn" onclick="downloadFileFromDetails(${announcement.id}, ${index})">
+                                            ⬇️ Descargar Archivo
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    filesContent = `
+                        <div class="details-section">
+                            <h4>Archivos Adjuntos</h4>
+                            <div class="detail-row">
+                                <div class="detail-value">No hay archivos adjuntos</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Construir contenido del modal
+                const detailsContent = `
+                    <div class="details-section">
+                        <h4>Información General</h4>
+                        <div class="detail-row">
+                            <div class="detail-label">Título:</div>
+                            <div class="detail-value">${announcement.title}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Departamento:</div>
+                            <div class="detail-value">${announcement.department}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Autor:</div>
+                            <div class="detail-value">${announcement.author}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="details-section">
+                        <h4>Fecha y Hora</h4>
+                        <div class="detail-row">
+                            <div class="detail-label">Fecha de inicio:</div>
+                            <div class="detail-value">${announcement.date}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Hora de inicio:</div>
+                            <div class="detail-value">${startTime}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Fecha de fin:</div>
+                            <div class="detail-value">${announcement.endDate || 'No especificada'}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Hora de fin:</div>
+                            <div class="detail-value">${endTime}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="details-section">
+                        <h4>Descripción</h4>
+                        <div class="detail-row">
+                            <div class="detail-value">${announcement.description}</div>
+                        </div>
+                    </div>
+                    
+                    ${filesContent}
+                    
+                    <div class="details-section">
+                        <h4>Información Técnica</h4>
+                        <div class="detail-row">
+                            <div class="detail-label">ID del anuncio:</div>
+                            <div class="detail-value">${announcement.id}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">ID del autor:</div>
+                            <div class="detail-value">${announcement.authorId}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">ID del dispositivo:</div>
+                            <div class="detail-value">${announcement.deviceId}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Creado el:</div>
+                            <div class="detail-value">${formattedCreatedDate}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Actualizado el:</div>
+                            <div class="detail-value">${formattedUpdatedDate}</div>
+                        </div>
+                    </div>
+                `;
+                
+                detailsBody.innerHTML = detailsContent;
+                detailsModal.classList.add('active');
+            }
+        }
+
+        // Generar vista previa de archivo
+        function generateFilePreview(file) {
+            if (file.type.startsWith('image/')) {
+                const base64Data = `data:${file.type};base64,${file.data}`;
+                return `<img src="${base64Data}" class="image-preview" alt="${file.name}">`;
+            } else if (file.type.startsWith('video/')) {
+                const base64Data = `data:${file.type};base64,${file.data}`;
+                return `<video controls class="video-preview">
+                    <source src="${base64Data}" type="${file.type}">
+                    Tu navegador no soporta la reproducción de video.
+                </video>`;
+            } else if (file.type === 'application/pdf') {
+                const base64Data = `data:${file.type};base64,${file.data}`;
+                return `<iframe src="${base64Data}" class="pdf-preview" title="${file.name}"></iframe>`;
+            } else {
+                return `
+                    <div class="no-preview">
+                        <div class="preview-icon">${getFileIcon(file.type)}</div>
+                        <p>Vista previa no disponible para este tipo de archivo</p>
+                        <p style="font-size: 0.8rem; color: var(--gris); margin-top: 0.5rem;">
+                            ${getFileTypeName(file.type)} • ${formatFileSize(file.size)}
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        // Descargar archivo desde detalles
+        function downloadFileFromDetails(announcementId, fileIndex) {
+            const announcement = announcements.find(ann => ann.id === announcementId);
+            if (announcement && announcement.files && announcement.files[fileIndex]) {
+                const file = announcement.files[fileIndex];
+                const byteCharacters = atob(file.data);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: file.type });
+                
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        // Cerrar modal de detalles
+        function closeDetailsModal() {
+            detailsModal.classList.remove('active');
+        }
+
         // Eliminar un anuncio
         async function deleteAnnouncement(id) {
             if (isProcessing) return;
@@ -2825,25 +3249,6 @@
                 const startTime = announcement.time ? convertTo12Hour(announcement.time) : 'No especificada';
                 const endTime = announcement.endTime ? convertTo12Hour(announcement.endTime) : null;
                 
-                // Generar HTML para archivos adjuntos
-                let attachmentsHTML = '';
-                if (announcement.file) {
-                    attachmentsHTML = `
-                        <div class="announcement-attachments">
-                            <div class="attachment-item">
-                                <div class="attachment-icon">${getFileIcon(announcement.file.type)}</div>
-                                <div class="attachment-info">
-                                    <div class="attachment-name">${announcement.file.name}</div>
-                                    <div class="attachment-size">${formatFileSize(announcement.file.size)}</div>
-                                </div>
-                                <button class="attachment-download" onclick="downloadFile(${announcement.id})" title="Descargar archivo">
-                                    ⬇️
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }
-                
                 announcementsHTML += `
                     <div class="announcement-card" id="announcement-${announcement.id}">
                         <h3>${announcement.title}</h3>
@@ -2857,7 +3262,6 @@
                         <div class="announcement-description">
                             ${announcement.description}
                         </div>
-                        ${attachmentsHTML}
                         <div class="announcement-author">
                             <strong>Publicado por:</strong> ${announcement.author}
                             <span style="font-size: 0.7rem; color: #666; display: block; margin-top: 0.2rem;">
@@ -2869,29 +3273,6 @@
             });
             
             announcementsContainer.innerHTML = announcementsHTML;
-        }
-
-        // Función para descargar archivo adjunto
-        function downloadFile(announcementId) {
-            const announcement = announcements.find(ann => ann.id === announcementId);
-            if (announcement && announcement.file) {
-                const byteCharacters = atob(announcement.file.data);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: announcement.file.type });
-                
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = announcement.file.name;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }
         }
 
         // Renderizar todos los anuncios en el panel de administrador
@@ -2935,25 +3316,15 @@
                 const startTime = announcement.time ? convertTo12Hour(announcement.time) : 'No especificada';
                 const endTime = announcement.endTime ? convertTo12Hour(announcement.endTime) : null;
                 
-                // Generar HTML para archivos adjuntos
-                let attachmentsHTML = '';
-                if (announcement.file) {
-                    attachmentsHTML = `
-                        <div class="announcement-attachments">
-                            <div class="attachment-item">
-                                <div class="attachment-icon">${getFileIcon(announcement.file.type)}</div>
-                                <div class="attachment-info">
-                                    <div class="attachment-name">${announcement.file.name}</div>
-                                    <div class="attachment-size">${formatFileSize(announcement.file.size)}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
+                // Contar archivos adjuntos
+                const fileCount = announcement.files ? announcement.files.length : 0;
                 
                 adminAnnouncementsHTML += `
                     <div class="announcement-card" id="admin-announcement-${announcement.id}">
                         <div class="announcement-actions">
+                            <button class="action-btn details-btn" onclick="openDetailsModal(${announcement.id})">
+                                👁️
+                            </button>
                             <button class="action-btn edit-btn" onclick="openEditPanel(${announcement.id})">
                                 ✏️
                             </button>
@@ -2972,9 +3343,11 @@
                         <div class="announcement-description">
                             ${announcement.description}
                         </div>
-                        ${attachmentsHTML}
                         <div class="announcement-author">
                             <strong>Publicado por:</strong> ${announcement.author}
+                            <span style="font-size: 0.7rem; color: var(--morado); display: block; margin-top: 0.2rem;">
+                                📎 ${fileCount} archivo(s) adjunto(s)
+                            </span>
                             <span style="font-size: 0.7rem; color: #666;">
                                 (Dispositivo: ${announcement.deviceId?.substring(0, 8)}...)
                             </span>
@@ -3003,6 +3376,12 @@
 
         // Inicializar la aplicación cuando se carga la página
         document.addEventListener('DOMContentLoaded', initApp);
+        
+        // Hacer funciones disponibles globalmente
+        window.openDetailsModal = openDetailsModal;
+        window.downloadFileFromDetails = downloadFileFromDetails;
+        window.openEditPanel = openEditPanel;
+        window.deleteAnnouncement = deleteAnnouncement;
     </script>
 </body>
 </html>
