@@ -720,6 +720,112 @@
             color: white;
         }
         
+        /* Checkbox para selección múltiple */
+        .announcement-checkbox {
+            position: absolute;
+            top: 1.2rem;
+            left: 1.2rem;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .announcement-card.selectable {
+            padding-left: 3rem;
+        }
+        
+        /* Barra de acciones para selección múltiple */
+        .selection-toolbar {
+            background-color: var(--azul-claro);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .selection-toolbar.active {
+            display: flex;
+        }
+        
+        .selection-info {
+            font-weight: 500;
+            color: var(--azul-principal);
+        }
+        
+        .selection-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .select-all-btn {
+            background-color: var(--gris);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        
+        .select-all-btn:hover {
+            background-color: #6b7280;
+        }
+        
+        .delete-selected-btn {
+            background-color: var(--rojo);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        
+        .delete-selected-btn:hover {
+            background-color: #b91c1c;
+        }
+        
+        .cancel-selection-btn {
+            background-color: var(--gris);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        
+        .cancel-selection-btn:hover {
+            background-color: #6b7280;
+        }
+        
+        /* Botón para activar selección múltiple */
+        .multi-delete-btn {
+            background-color: var(--rojo);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .multi-delete-btn:hover {
+            background-color: #b91c1c;
+        }
+        
         /* Panel de administrador */
         .admin-panel {
             background-color: var(--blanco);
@@ -827,7 +933,7 @@
         
         .detail-row {
             display: flex;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
         }
         
         .detail-label {
@@ -839,6 +945,7 @@
         .detail-value {
             flex: 1;
             color: var(--gris-oscuro);
+            line-height: 1.5;
         }
         
         .file-preview-container {
@@ -1372,6 +1479,17 @@
                 height: 300px;
             }
             
+            /* Barra de selección responsive */
+            .selection-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .selection-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
             .success-modal-content {
                 padding: 1.5rem;
                 margin: 1rem;
@@ -1458,6 +1576,15 @@
             
             .details-header h3 {
                 font-size: 1.1rem;
+            }
+            
+            .announcement-checkbox {
+                top: 0.8rem;
+                left: 0.8rem;
+            }
+            
+            .announcement-card.selectable {
+                padding-left: 2.5rem;
             }
         }
         
@@ -1862,8 +1989,26 @@
             <div class="step-nav">
                 <button id="backToMainFromAdminBtn" class="back-btn">← Volver</button>
                 <h2 class="step-title">Panel de Administrador - Todos los Anuncios</h2>
-                <button id="refreshCloudBtn" class="submit-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; background-color: var(--verde);">🔄 Actualizar</button>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button id="multiDeleteBtn" class="multi-delete-btn" style="display: none;">
+                        🗑️ Eliminar Varios
+                    </button>
+                    <button id="refreshCloudBtn" class="submit-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; background-color: var(--verde);">🔄 Actualizar</button>
+                </div>
             </div>
+            
+            <!-- Barra de herramientas para selección múltiple -->
+            <div class="selection-toolbar" id="selectionToolbar">
+                <div class="selection-info" id="selectionInfo">
+                    0 anuncios seleccionados
+                </div>
+                <div class="selection-actions">
+                    <button class="select-all-btn" id="selectAllBtn">Seleccionar Todos</button>
+                    <button class="delete-selected-btn" id="deleteSelectedBtn">Eliminar Seleccionados</button>
+                    <button class="cancel-selection-btn" id="cancelSelectionBtn">Cancelar</button>
+                </div>
+            </div>
+            
             <div class="current-department">
                 <h3>Vista completa de todos los anuncios de todos los departamentos</h3>
                 <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
@@ -1979,6 +2124,8 @@
         let isProcessing = false;
         let needsReload = false;
         let selectedFiles = [];
+        let selectedAnnouncements = new Set();
+        let isSelectionMode = false;
 
         // Elementos del DOM
         const loginBtn = document.getElementById('loginBtn');
@@ -2021,6 +2168,12 @@
         const detailsModal = document.getElementById('detailsModal');
         const closeDetailsBtn = document.getElementById('closeDetailsBtn');
         const detailsBody = document.getElementById('detailsBody');
+        const multiDeleteBtn = document.getElementById('multiDeleteBtn');
+        const selectionToolbar = document.getElementById('selectionToolbar');
+        const selectionInfo = document.getElementById('selectionInfo');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+        const cancelSelectionBtn = document.getElementById('cancelSelectionBtn');
 
         // Función para convertir hora de 24h a 12h con AM/PM
         function convertTo12Hour(time) {
@@ -2256,6 +2409,27 @@
             }
         }
 
+        // Eliminar múltiples anuncios
+        async function deleteMultipleAnnouncements(ids) {
+            if (!window.firebaseDatabase || ids.length === 0) {
+                return false;
+            }
+            
+            try {
+                const deletePromises = ids.map(id => {
+                    const announcementRef = window.firebaseRef(window.firebaseDatabase, 'announcements/' + id);
+                    return window.firebaseRemove(announcementRef);
+                });
+                
+                await Promise.all(deletePromises);
+                console.log(`${ids.length} anuncios eliminados de Firebase`);
+                return true;
+            } catch (error) {
+                console.error("Error eliminando múltiples anuncios de Firebase:", error);
+                return false;
+            }
+        }
+
         // Mostrar modal de éxito
         function showSuccessModal(title, message, icon = "✓") {
             successTitle.textContent = title;
@@ -2413,10 +2587,142 @@
             });
         }
 
+        // Configurar event listeners para selección múltiple
+        function setupMultiSelectionEventListeners() {
+            // Botón para activar selección múltiple
+            multiDeleteBtn.addEventListener('click', () => {
+                startSelectionMode();
+            });
+            
+            // Botón para seleccionar todos
+            selectAllBtn.addEventListener('click', () => {
+                if (selectedAnnouncements.size === announcements.length) {
+                    // Si ya están todos seleccionados, deseleccionar todos
+                    selectedAnnouncements.clear();
+                } else {
+                    // Seleccionar todos los anuncios
+                    announcements.forEach(ann => {
+                        selectedAnnouncements.add(ann.id);
+                    });
+                }
+                updateSelectionUI();
+            });
+            
+            // Botón para eliminar seleccionados
+            deleteSelectedBtn.addEventListener('click', () => {
+                deleteSelectedAnnouncements();
+            });
+            
+            // Botón para cancelar selección
+            cancelSelectionBtn.addEventListener('click', () => {
+                cancelSelectionMode();
+            });
+        }
+
+        // Iniciar modo de selección
+        function startSelectionMode() {
+            isSelectionMode = true;
+            selectedAnnouncements.clear();
+            
+            // Mostrar/ocultar elementos
+            multiDeleteBtn.style.display = 'none';
+            selectionToolbar.classList.add('active');
+            
+            // Actualizar UI de los anuncios
+            renderAdminAnnouncements();
+        }
+
+        // Cancelar modo de selección
+        function cancelSelectionMode() {
+            isSelectionMode = false;
+            selectedAnnouncements.clear();
+            
+            // Mostrar/ocultar elementos
+            multiDeleteBtn.style.display = 'block';
+            selectionToolbar.classList.remove('active');
+            
+            // Actualizar UI de los anuncios
+            renderAdminAnnouncements();
+        }
+
+        // Actualizar UI de selección
+        function updateSelectionUI() {
+            const count = selectedAnnouncements.size;
+            selectionInfo.textContent = `${count} anuncio${count !== 1 ? 's' : ''} seleccionado${count !== 1 ? 's' : ''}`;
+            
+            // Actualizar checkboxes en los anuncios
+            document.querySelectorAll('.announcement-checkbox').forEach(checkbox => {
+                const announcementId = parseInt(checkbox.getAttribute('data-id'));
+                checkbox.checked = selectedAnnouncements.has(announcementId);
+            });
+            
+            // Actualizar texto del botón "Seleccionar Todos"
+            selectAllBtn.textContent = selectedAnnouncements.size === announcements.length ? 
+                'Deseleccionar Todos' : 'Seleccionar Todos';
+        }
+
+        // Manejar selección/deselección de un anuncio
+        function toggleAnnouncementSelection(id) {
+            if (selectedAnnouncements.has(id)) {
+                selectedAnnouncements.delete(id);
+            } else {
+                selectedAnnouncements.add(id);
+            }
+            updateSelectionUI();
+        }
+
+        // Eliminar anuncios seleccionados
+        async function deleteSelectedAnnouncements() {
+            if (selectedAnnouncements.size === 0) {
+                showMessage('No hay anuncios seleccionados para eliminar.', 'warning');
+                return;
+            }
+            
+            if (!confirm(`¿Estás seguro de que quieres eliminar ${selectedAnnouncements.size} anuncio(s)?`)) {
+                return;
+            }
+            
+            if (isProcessing) return;
+            isProcessing = true;
+            
+            const idsToDelete = Array.from(selectedAnnouncements);
+            
+            // Intentar eliminar de Firebase
+            const firebaseSuccess = await deleteMultipleAnnouncements(idsToDelete);
+            
+            isProcessing = false;
+            
+            if (firebaseSuccess) {
+                // Cancelar modo de selección
+                cancelSelectionMode();
+                
+                // Mostrar modal de éxito
+                showSuccessModal(
+                    '¡Anuncios Eliminados!', 
+                    `${idsToDelete.length} anuncio(s) se han eliminado exitosamente. La página se recargará automáticamente.`,
+                    '🗑️'
+                );
+                
+                // Mostrar overlay de carga y recargar después de 2 segundos
+                setTimeout(() => {
+                    showLoadingOverlay('Actualizando...', 'La página se está recargando para actualizar la lista de anuncios...');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                }, 2000);
+                
+            } else {
+                showMessage('Error al eliminar los anuncios. Intenta nuevamente.', 'error');
+            }
+        }
+
         // Configurar event listeners
         function setupEventListeners() {
             // Configurar event listeners para archivos
             setupFileEventListeners();
+            
+            // Configurar event listeners para selección múltiple
+            setupMultiSelectionEventListeners();
             
             // Toggle formulario de login
             loginBtn.addEventListener('click', () => {
@@ -2614,10 +2920,12 @@
                 loginBtn.style.display = 'none';
                 logoutBtn.style.display = 'block';
                 adminViewBtn.style.display = 'block';
+                multiDeleteBtn.style.display = 'flex';
             } else {
                 loginBtn.style.display = 'block';
                 logoutBtn.style.display = 'none';
                 adminViewBtn.style.display = 'none';
+                multiDeleteBtn.style.display = 'none';
             }
         }
 
@@ -2940,6 +3248,9 @@
 
         // Abrir panel de edición para un anuncio específico
         function openEditPanel(id) {
+            // Si estamos en modo selección, no abrir edición
+            if (isSelectionMode) return;
+            
             // Buscar el anuncio
             const announcement = announcements.find(ann => ann.id === id);
             
@@ -2973,35 +3284,18 @@
 
         // Abrir modal de detalles
         function openDetailsModal(id) {
+            // Si estamos en modo selección, no abrir detalles
+            if (isSelectionMode) return;
+            
             // Buscar el anuncio
             const announcement = announcements.find(ann => ann.id === id);
             
             if (announcement) {
-                // Formatear fechas
-                const createdDate = new Date(announcement.createdAt);
-                const updatedDate = new Date(announcement.updatedAt);
-                
-                const formattedCreatedDate = createdDate.toLocaleDateString('es-ES', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                
-                const formattedUpdatedDate = updatedDate.toLocaleDateString('es-ES', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                
                 // Convertir horas a formato 12h
                 const startTime = announcement.time ? convertTo12Hour(announcement.time) : 'No especificada';
                 const endTime = announcement.endTime ? convertTo12Hour(announcement.endTime) : 'No especificada';
                 
-                // Generar contenido para archivos
+                // Generar contenido para archivos (solo información esencial)
                 let filesContent = '';
                 if (announcement.files && announcement.files.length > 0) {
                     filesContent = `
@@ -3021,30 +3315,16 @@
                                     <div class="file-preview">
                                         ${generateFilePreview(file)}
                                     </div>
-                                    <div class="preview-actions">
-                                        <button class="preview-download-btn" onclick="downloadFileFromDetails(${announcement.id}, ${index})">
-                                            ⬇️ Descargar Archivo
-                                        </button>
-                                    </div>
                                 </div>
                             `).join('')}
                         </div>
                     `;
-                } else {
-                    filesContent = `
-                        <div class="details-section">
-                            <h4>Archivos Adjuntos</h4>
-                            <div class="detail-row">
-                                <div class="detail-value">No hay archivos adjuntos</div>
-                            </div>
-                        </div>
-                    `;
                 }
                 
-                // Construir contenido del modal
+                // Construir contenido del modal - SOLO INFORMACIÓN ESENCIAL
                 const detailsContent = `
                     <div class="details-section">
-                        <h4>Información General</h4>
+                        <h4>Información del Anuncio</h4>
                         <div class="detail-row">
                             <div class="detail-label">Título:</div>
                             <div class="detail-value">${announcement.title}</div>
@@ -3069,48 +3349,26 @@
                             <div class="detail-label">Hora de inicio:</div>
                             <div class="detail-value">${startTime}</div>
                         </div>
+                        ${announcement.endDate ? `
                         <div class="detail-row">
                             <div class="detail-label">Fecha de fin:</div>
-                            <div class="detail-value">${announcement.endDate || 'No especificada'}</div>
+                            <div class="detail-value">${announcement.endDate}</div>
                         </div>
+                        ` : ''}
+                        ${announcement.endTime ? `
                         <div class="detail-row">
                             <div class="detail-label">Hora de fin:</div>
                             <div class="detail-value">${endTime}</div>
                         </div>
+                        ` : ''}
                     </div>
                     
                     <div class="details-section">
                         <h4>Descripción</h4>
-                        <div class="detail-row">
-                            <div class="detail-value">${announcement.description}</div>
-                        </div>
+                        <div class="detail-value">${announcement.description}</div>
                     </div>
                     
                     ${filesContent}
-                    
-                    <div class="details-section">
-                        <h4>Información Técnica</h4>
-                        <div class="detail-row">
-                            <div class="detail-label">ID del anuncio:</div>
-                            <div class="detail-value">${announcement.id}</div>
-                        </div>
-                        <div class="detail-row">
-                            <div class="detail-label">ID del autor:</div>
-                            <div class="detail-value">${announcement.authorId}</div>
-                        </div>
-                        <div class="detail-row">
-                            <div class="detail-label">ID del dispositivo:</div>
-                            <div class="detail-value">${announcement.deviceId}</div>
-                        </div>
-                        <div class="detail-row">
-                            <div class="detail-label">Creado el:</div>
-                            <div class="detail-value">${formattedCreatedDate}</div>
-                        </div>
-                        <div class="detail-row">
-                            <div class="detail-label">Actualizado el:</div>
-                            <div class="detail-value">${formattedUpdatedDate}</div>
-                        </div>
-                    </div>
                 `;
                 
                 detailsBody.innerHTML = detailsContent;
@@ -3140,6 +3398,11 @@
                         <p style="font-size: 0.8rem; color: var(--gris); margin-top: 0.5rem;">
                             ${getFileTypeName(file.type)} • ${formatFileSize(file.size)}
                         </p>
+                        <div class="preview-actions">
+                            <button class="preview-download-btn" onclick="downloadFileFromDetails(${announcement.id}, ${index})">
+                                ⬇️ Descargar Archivo
+                            </button>
+                        </div>
                     </div>
                 `;
             }
@@ -3174,8 +3437,14 @@
             detailsModal.classList.remove('active');
         }
 
-        // Eliminar un anuncio
+        // Eliminar un anuncio individual
         async function deleteAnnouncement(id) {
+            // Si estamos en modo selección, usar toggle de selección
+            if (isSelectionMode) {
+                toggleAnnouncementSelection(id);
+                return;
+            }
+            
             if (isProcessing) return;
             
             if (confirm('¿Estás seguro de que quieres eliminar este anuncio?')) {
@@ -3319,18 +3588,27 @@
                 // Contar archivos adjuntos
                 const fileCount = announcement.files ? announcement.files.length : 0;
                 
+                // Clases CSS para modo selección
+                const selectableClass = isSelectionMode ? 'selectable' : '';
+                const checkbox = isSelectionMode ? 
+                    `<input type="checkbox" class="announcement-checkbox" data-id="${announcement.id}" onclick="toggleAnnouncementSelection(${announcement.id})">` : 
+                    '';
+                
                 adminAnnouncementsHTML += `
-                    <div class="announcement-card" id="admin-announcement-${announcement.id}">
+                    <div class="announcement-card ${selectableClass}" id="admin-announcement-${announcement.id}">
+                        ${checkbox}
                         <div class="announcement-actions">
-                            <button class="action-btn details-btn" onclick="openDetailsModal(${announcement.id})">
-                                👁️
-                            </button>
-                            <button class="action-btn edit-btn" onclick="openEditPanel(${announcement.id})">
-                                ✏️
-                            </button>
-                            <button class="action-btn delete-btn" onclick="deleteAnnouncement(${announcement.id})">
-                                🗑️
-                            </button>
+                            ${!isSelectionMode ? `
+                                <button class="action-btn details-btn" onclick="openDetailsModal(${announcement.id})">
+                                    👁️
+                                </button>
+                                <button class="action-btn edit-btn" onclick="openEditPanel(${announcement.id})">
+                                    ✏️
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteAnnouncement(${announcement.id})">
+                                    🗑️
+                                </button>
+                            ` : ''}
                         </div>
                         <h3>${announcement.title}</h3>
                         <div class="announcement-category">${announcement.department}</div>
@@ -3345,12 +3623,11 @@
                         </div>
                         <div class="announcement-author">
                             <strong>Publicado por:</strong> ${announcement.author}
-                            <span style="font-size: 0.7rem; color: var(--morado); display: block; margin-top: 0.2rem;">
-                                📎 ${fileCount} archivo(s) adjunto(s)
-                            </span>
-                            <span style="font-size: 0.7rem; color: #666;">
-                                (Dispositivo: ${announcement.deviceId?.substring(0, 8)}...)
-                            </span>
+                            ${fileCount > 0 ? `
+                                <span style="font-size: 0.7rem; color: var(--morado); display: block; margin-top: 0.2rem;">
+                                    📎 ${fileCount} archivo(s) adjunto(s)
+                                </span>
+                            ` : ''}
                             <span style="font-size: 0.7rem; color: #666; display: block; margin-top: 0.2rem;">
                                 Publicado el: ${formattedDate}
                             </span>
@@ -3360,6 +3637,11 @@
             });
             
             adminAnnouncementsContainer.innerHTML = adminAnnouncementsHTML;
+            
+            // Actualizar UI de selección si estamos en modo selección
+            if (isSelectionMode) {
+                updateSelectionUI();
+            }
         }
 
         // Mostrar mensajes temporales
@@ -3382,6 +3664,7 @@
         window.downloadFileFromDetails = downloadFileFromDetails;
         window.openEditPanel = openEditPanel;
         window.deleteAnnouncement = deleteAnnouncement;
+        window.toggleAnnouncementSelection = toggleAnnouncementSelection;
     </script>
 </body>
 </html>
