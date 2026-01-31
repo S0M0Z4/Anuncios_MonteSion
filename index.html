@@ -725,18 +725,43 @@
             position: absolute;
             top: 1.2rem;
             left: 1.2rem;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
+            z-index: 2;
+            accent-color: var(--azul-principal);
+            transform: scale(1.2);
         }
         
         .announcement-card.selectable {
-            padding-left: 3rem;
+            padding-left: 3.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        /* Efecto de temblor para los anuncios */
+        .announcement-card.shaking {
+            animation: shake 0.5s ease-in-out infinite alternate;
+            border-color: var(--rojo) !important;
+        }
+        
+        @keyframes shake {
+            0% { transform: translateX(-2px) rotate(-0.5deg); }
+            25% { transform: translateX(2px) rotate(0.5deg); }
+            50% { transform: translateX(-2px) rotate(-0.5deg); }
+            75% { transform: translateX(2px) rotate(0.5deg); }
+            100% { transform: translateX(-2px) rotate(-0.5deg); }
+        }
+        
+        /* Estilo para anuncios seleccionados */
+        .announcement-card.selected {
+            background-color: rgba(59, 130, 246, 0.1) !important;
+            border-left: 4px solid var(--azul-principal) !important;
         }
         
         /* Barra de acciones para selección múltiple */
         .selection-toolbar {
-            background-color: var(--azul-claro);
+            background: linear-gradient(135deg, var(--azul-claro) 0%, #dbeafe 100%);
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 1rem;
@@ -745,6 +770,8 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
+            border: 2px solid var(--azul-secundario);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
         }
         
         .selection-toolbar.active {
@@ -752,8 +779,17 @@
         }
         
         .selection-info {
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 1rem;
             color: var(--azul-principal);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .selection-info::before {
+            content: '📋';
+            font-size: 1.2rem;
         }
         
         .selection-actions {
@@ -789,6 +825,12 @@
         
         .delete-selected-btn:hover {
             background-color: #b91c1c;
+        }
+        
+        .delete-selected-btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
         
         .cancel-selection-btn {
@@ -1287,6 +1329,81 @@
             100% { transform: scale(1); opacity: 1; }
         }
         
+        /* Alertas personalizadas */
+        .custom-alert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .alert-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            border-top: 5px solid var(--verde);
+        }
+        
+        .alert-content.error {
+            border-top-color: var(--rojo);
+        }
+        
+        .alert-content.warning {
+            border-top-color: var(--naranja);
+        }
+        
+        .alert-content.info {
+            border-top-color: var(--azul-secundario);
+        }
+        
+        .alert-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-content h3 {
+            color: var(--azul-principal);
+            margin-bottom: 1rem;
+        }
+        
+        .alert-content p {
+            margin-bottom: 2rem;
+            color: var(--gris-oscuro);
+            line-height: 1.5;
+        }
+        
+        .alert-btn {
+            padding: 0.8rem 2rem;
+            background: var(--azul-secundario);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .alert-btn:hover {
+            background: #2563eb;
+        }
+        
+        /* Animación para alertas */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
         /* Responsive mejorado para teléfonos */
         @media (max-width: 768px) {
             .header {
@@ -1507,6 +1624,11 @@
             .loading-overlay-icon {
                 font-size: 2.5rem;
             }
+            
+            .alert-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
         }
         
         @media (max-width: 480px) {
@@ -1581,6 +1703,7 @@
             .announcement-checkbox {
                 top: 0.8rem;
                 left: 0.8rem;
+                transform: scale(1);
             }
             
             .announcement-card.selectable {
@@ -2004,7 +2127,7 @@
                 </div>
                 <div class="selection-actions">
                     <button class="select-all-btn" id="selectAllBtn">Seleccionar Todos</button>
-                    <button class="delete-selected-btn" id="deleteSelectedBtn">Eliminar Seleccionados</button>
+                    <button class="delete-selected-btn" id="deleteSelectedBtn" disabled>Eliminar Seleccionados</button>
                     <button class="cancel-selection-btn" id="cancelSelectionBtn">Cancelar</button>
                 </div>
             </div>
@@ -2220,62 +2343,6 @@
             return 'Archivo';
         }
 
-        // Inicializar la aplicación
-        function initApp() {
-            // Verificar si necesitamos recargar
-            if (sessionStorage.getItem('needsReload') === 'true') {
-                sessionStorage.removeItem('needsReload');
-                showLoadingOverlay('Actualizando página...', 'La página se está recargando para mostrar los datos actualizados.');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-                return;
-            }
-            
-            // Establecer fecha mínima en los campos de fecha
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('date').min = today;
-            document.getElementById('endDate').min = today;
-            document.getElementById('editDate').min = today;
-            document.getElementById('editEndDate').min = today;
-            
-            // Generar un ID único para el dispositivo
-            if (!localStorage.getItem('deviceId')) {
-                deviceId = 'device_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-                localStorage.setItem('deviceId', deviceId);
-            } else {
-                deviceId = localStorage.getItem('deviceId');
-            }
-            
-            // Generar un ID único para el usuario actual (si no existe)
-            if (!localStorage.getItem('currentUserId')) {
-                const userId = 'user_' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('currentUserId', userId);
-            }
-            
-            currentUser = localStorage.getItem('currentUserId');
-            
-            // Mostrar estado de conexión
-            syncStatus.style.display = 'block';
-            syncStatusText.textContent = 'Conectando con la base de datos...';
-            
-            // Cargar anuncios desde Firebase
-            loadAnnouncementsFromFirebase();
-            
-            // Verificar si hay sesión de administrador activa
-            const adminSession = localStorage.getItem('adminSession');
-            if (adminSession === 'active') {
-                isAdminLoggedIn = true;
-                updateLoginUI();
-            }
-            
-            // Configurar event listeners
-            setupEventListeners();
-            
-            // Mostrar vista inicial
-            showView('departmentSelection');
-        }
-
         // Mostrar overlay de carga
         function showLoadingOverlay(title = 'Cargando...', message = 'Por favor espera mientras se actualiza la página.') {
             loadingTitle.textContent = title;
@@ -2430,12 +2497,182 @@
             }
         }
 
-        // Mostrar modal de éxito
-        function showSuccessModal(title, message, icon = "✓") {
-            successTitle.textContent = title;
-            successMessage.textContent = message;
-            successIcon.textContent = icon;
-            successModal.classList.add('active');
+        // Mostrar alerta personalizada
+        function showCustomAlert(type, title, message, icon = null) {
+            // Crear overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'custom-alert';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.3);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            `;
+            
+            // Iconos según el tipo
+            const icons = {
+                success: icon || '✅',
+                error: icon || '❌',
+                warning: icon || '⚠️',
+                info: icon || 'ℹ️'
+            };
+            
+            // Colores según el tipo
+            const colors = {
+                success: 'var(--verde)',
+                error: 'var(--rojo)',
+                warning: 'var(--naranja)',
+                info: 'var(--azul-secundario)'
+            };
+            
+            // Crear contenido
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert-content ${type}`;
+            alertDiv.style.cssText = `
+                background: white;
+                padding: 2rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                max-width: 400px;
+                width: 90%;
+                text-align: center;
+                border-top: 5px solid ${colors[type]};
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            alertDiv.innerHTML = `
+                <div class="alert-icon" style="font-size: 3rem; margin-bottom: 1rem;">
+                    ${icons[type]}
+                </div>
+                <h3 style="color: var(--azul-principal); margin-bottom: 1rem;">${title}</h3>
+                <p style="margin-bottom: 2rem; color: var(--gris-oscuro); line-height: 1.5;">${message}</p>
+                <button class="alert-btn" style="
+                    padding: 0.8rem 2rem;
+                    background: ${colors[type]};
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                ">Aceptar</button>
+            `;
+            
+            overlay.appendChild(alertDiv);
+            document.body.appendChild(overlay);
+            
+            // Configurar botón
+            const alertBtn = alertDiv.querySelector('.alert-btn');
+            alertBtn.addEventListener('click', () => {
+                document.body.removeChild(overlay);
+            });
+            
+            // Auto cerrar después de 3 segundos
+            setTimeout(() => {
+                if (document.body.contains(overlay)) {
+                    document.body.removeChild(overlay);
+                }
+            }, 3000);
+            
+            return overlay;
+        }
+
+        // Mostrar diálogo de confirmación
+        function showConfirmationDialog(title, message, type = 'warning') {
+            return new Promise((resolve) => {
+                // Crear overlay
+                const overlay = document.createElement('div');
+                overlay.className = 'custom-alert';
+                
+                // Iconos
+                const icons = {
+                    warning: '⚠️',
+                    danger: '❗',
+                    info: 'ℹ️'
+                };
+                
+                // Colores
+                const colors = {
+                    warning: 'var(--naranja)',
+                    danger: 'var(--rojo)',
+                    info: 'var(--azul-secundario)'
+                };
+                
+                // Crear contenido
+                const dialog = document.createElement('div');
+                dialog.className = `alert-content ${type}`;
+                dialog.style.cssText = `
+                    background: white;
+                    padding: 2rem;
+                    border-radius: 12px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                    max-width: 400px;
+                    width: 90%;
+                    text-align: center;
+                    border-top: 5px solid ${colors[type]};
+                    animation: fadeIn 0.3s ease;
+                `;
+                
+                dialog.innerHTML = `
+                    <div class="alert-icon" style="font-size: 3rem; margin-bottom: 1rem;">
+                        ${icons[type] || icons.warning}
+                    </div>
+                    <h3 style="color: var(--azul-principal); margin-bottom: 1rem;">${title}</h3>
+                    <p style="color: var(--gris-oscuro); margin-bottom: 2rem; line-height: 1.5;">${message}</p>
+                    <div style="display: flex; gap: 1rem;">
+                        <button id="cancelBtn" style="
+                            flex: 1;
+                            padding: 0.8rem;
+                            background: var(--gris-claro);
+                            color: var(--gris-oscuro);
+                            border: none;
+                            border-radius: 6px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: all 0.3s;
+                        ">Cancelar</button>
+                        <button id="confirmBtn" style="
+                            flex: 1;
+                            padding: 0.8rem;
+                            background: ${colors[type]};
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: all 0.3s;
+                        ">Eliminar</button>
+                    </div>
+                `;
+                
+                overlay.appendChild(dialog);
+                document.body.appendChild(overlay);
+                
+                // Configurar botones
+                document.getElementById('cancelBtn').addEventListener('click', () => {
+                    document.body.removeChild(overlay);
+                    resolve(false);
+                });
+                
+                document.getElementById('confirmBtn').addEventListener('click', () => {
+                    document.body.removeChild(overlay);
+                    resolve(true);
+                });
+                
+                // Cerrar al hacer clic fuera
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        document.body.removeChild(overlay);
+                        resolve(false);
+                    }
+                });
+            });
         }
 
         // Configurar event listeners para archivos
@@ -2630,6 +2867,18 @@
             
             // Actualizar UI de los anuncios
             renderAdminAnnouncements();
+            
+            // Aplicar efecto de "temblar" a los anuncios después de un breve retraso
+            setTimeout(() => {
+                document.querySelectorAll('.announcement-card').forEach(card => {
+                    card.classList.add('shaking');
+                    
+                    // Detener el temblor después de 2 segundos
+                    setTimeout(() => {
+                        card.classList.remove('shaking');
+                    }, 2000);
+                });
+            }, 100);
         }
 
         // Cancelar modo de selección
@@ -2650,15 +2899,29 @@
             const count = selectedAnnouncements.size;
             selectionInfo.textContent = `${count} anuncio${count !== 1 ? 's' : ''} seleccionado${count !== 1 ? 's' : ''}`;
             
-            // Actualizar checkboxes en los anuncios
-            document.querySelectorAll('.announcement-checkbox').forEach(checkbox => {
-                const announcementId = parseInt(checkbox.getAttribute('data-id'));
-                checkbox.checked = selectedAnnouncements.has(announcementId);
+            // Actualizar checkboxes y estilos de los anuncios
+            document.querySelectorAll('.announcement-card.selectable').forEach(card => {
+                const checkbox = card.querySelector('.announcement-checkbox');
+                if (checkbox) {
+                    const announcementId = parseInt(checkbox.getAttribute('data-id'));
+                    const isSelected = selectedAnnouncements.has(announcementId);
+                    checkbox.checked = isSelected;
+                    
+                    // Añadir/quitar clase "selected"
+                    if (isSelected) {
+                        card.classList.add('selected');
+                    } else {
+                        card.classList.remove('selected');
+                    }
+                }
             });
             
             // Actualizar texto del botón "Seleccionar Todos"
             selectAllBtn.textContent = selectedAnnouncements.size === announcements.length ? 
                 'Deseleccionar Todos' : 'Seleccionar Todos';
+                
+            // Habilitar/deshabilitar botón de eliminar
+            deleteSelectedBtn.disabled = count === 0;
         }
 
         // Manejar selección/deselección de un anuncio
@@ -2674,11 +2937,17 @@
         // Eliminar anuncios seleccionados
         async function deleteSelectedAnnouncements() {
             if (selectedAnnouncements.size === 0) {
-                showMessage('No hay anuncios seleccionados para eliminar.', 'warning');
+                showCustomAlert('warning', 'Sin selección', 'No hay anuncios seleccionados para eliminar.');
                 return;
             }
             
-            if (!confirm(`¿Estás seguro de que quieres eliminar ${selectedAnnouncements.size} anuncio(s)?`)) {
+            const confirmed = await showConfirmationDialog(
+                '¿Eliminar anuncios seleccionados?',
+                `¿Estás seguro de que quieres eliminar ${selectedAnnouncements.size} anuncio(s)? Esta acción no se puede deshacer.`,
+                'danger'
+            );
+            
+            if (!confirmed) {
                 return;
             }
             
@@ -2687,32 +2956,39 @@
             
             const idsToDelete = Array.from(selectedAnnouncements);
             
+            // Mostrar overlay de carga
+            showLoadingOverlay('Eliminando anuncios...', `Eliminando ${idsToDelete.length} anuncio(s)...`);
+            
             // Intentar eliminar de Firebase
             const firebaseSuccess = await deleteMultipleAnnouncements(idsToDelete);
             
             isProcessing = false;
+            hideLoadingOverlay();
             
             if (firebaseSuccess) {
                 // Cancelar modo de selección
                 cancelSelectionMode();
                 
-                // Mostrar modal de éxito
-                showSuccessModal(
-                    '¡Anuncios Eliminados!', 
+                // Mostrar alerta de éxito
+                const alert = showCustomAlert(
+                    'success',
+                    '¡Anuncios Eliminados!',
                     `${idsToDelete.length} anuncio(s) se han eliminado exitosamente. La página se recargará automáticamente.`,
                     '🗑️'
                 );
                 
-                // Mostrar overlay de carga y recargar después de 2 segundos
+                // Forzar recarga completa de la página después de 2 segundos
                 setTimeout(() => {
-                    showLoadingOverlay('Actualizando...', 'La página se está recargando para actualizar la lista de anuncios...');
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
+                    // Marcar que necesita recarga
+                    sessionStorage.setItem('needsReload', 'true');
+                    sessionStorage.setItem('reloadMessage', `${idsToDelete.length} anuncios eliminados correctamente`);
+                    
+                    // Recargar completamente
+                    window.location.reload();
                 }, 2000);
                 
             } else {
-                showMessage('Error al eliminar los anuncios. Intenta nuevamente.', 'error');
+                showCustomAlert('error', 'Error', 'Error al eliminar los anuncios. Intenta nuevamente.');
             }
         }
 
@@ -2770,7 +3046,7 @@
                 // Simular recarga forzando una nueva lectura
                 loadAnnouncementsFromFirebase();
                 setTimeout(() => {
-                    showSuccessModal('¡Datos Actualizados!', 'Los anuncios se han actualizado correctamente.', '🔄');
+                    showCustomAlert('success', '¡Datos Actualizados!', 'Los anuncios se han actualizado correctamente.', '🔄');
                 }, 300);
             });
             
@@ -2894,12 +3170,12 @@
                 isAdminLoggedIn = true;
                 localStorage.setItem('adminSession', 'active');
                 updateLoginUI();
-                showSuccessModal('¡Sesión Iniciada!', 'Sesión de administrador iniciada correctamente.', '🔐');
+                showCustomAlert('success', '¡Sesión Iniciada!', 'Sesión de administrador iniciada correctamente.', '🔐');
                 loginForm.classList.remove('active');
                 usernameInput.value = '';
                 passwordInput.value = '';
             } else {
-                showMessage('Credenciales incorrectas. Intenta nuevamente.', 'error');
+                showCustomAlert('error', 'Credenciales incorrectas', 'El usuario o contraseña son incorrectos. Intenta nuevamente.');
             }
         }
 
@@ -2908,7 +3184,7 @@
             isAdminLoggedIn = false;
             localStorage.removeItem('adminSession');
             updateLoginUI();
-            showSuccessModal('¡Sesión Cerrada!', 'Sesión de administrador cerrada correctamente.', '🚪');
+            showCustomAlert('success', '¡Sesión Cerrada!', 'Sesión de administrador cerrada correctamente.', '🚪');
             
             // Volver a vista de departamentos
             showView('departmentSelection');
@@ -2993,7 +3269,7 @@
         // Mostrar vista de administrador
         function showAdminView() {
             if (!isAdminLoggedIn) {
-                showMessage('Debes iniciar sesión como administrador primero.', 'error');
+                showCustomAlert('error', 'Acceso denegado', 'Debes iniciar sesión como administrador primero.');
                 loginForm.classList.add('active');
                 return;
             }
@@ -3081,9 +3357,10 @@
                         // Limpiar formulario
                         resetForm();
                         
-                        // Mostrar modal de éxito
-                        showSuccessModal(
-                            '¡Anuncio Publicado!', 
+                        // Mostrar alerta de éxito
+                        const alert = showCustomAlert(
+                            'success',
+                            '¡Anuncio Publicado!',
                             'Tu anuncio se ha publicado exitosamente. La página se recargará automáticamente.',
                             '📢'
                         );
@@ -3092,12 +3369,14 @@
                         setTimeout(() => {
                             showLoadingOverlay('Actualizando...', 'La página se está recargando para mostrar tu anuncio...');
                             setTimeout(() => {
+                                sessionStorage.setItem('needsReload', 'true');
+                                sessionStorage.setItem('reloadMessage', 'Anuncio publicado correctamente');
                                 window.location.reload();
                             }, 2000);
                         }, 2000);
                         
                     } else {
-                        showMessage('Error al publicar el anuncio. Intenta nuevamente.', 'error');
+                        showCustomAlert('error', 'Error', 'Error al publicar el anuncio. Intenta nuevamente.');
                     }
                 };
                 
@@ -3116,9 +3395,10 @@
                     // Limpiar formulario
                     resetForm();
                     
-                    // Mostrar modal de éxito
-                    showSuccessModal(
-                        '¡Anuncio Publicado!', 
+                    // Mostrar alerta de éxito
+                    const alert = showCustomAlert(
+                        'success',
+                        '¡Anuncio Publicado!',
                         'Tu anuncio se ha publicado exitosamente. La página se recargará automáticamente.',
                         '📢'
                     );
@@ -3127,12 +3407,14 @@
                     setTimeout(() => {
                         showLoadingOverlay('Actualizando...', 'La página se está recargando para mostrar tu anuncio...');
                         setTimeout(() => {
+                            sessionStorage.setItem('needsReload', 'true');
+                            sessionStorage.setItem('reloadMessage', 'Anuncio publicado correctamente');
                             window.location.reload();
                         }, 2000);
                     }, 2000);
                     
                 } else {
-                    showMessage('Error al publicar el anuncio. Intenta nuevamente.', 'error');
+                    showCustomAlert('error', 'Error', 'Error al publicar el anuncio. Intenta nuevamente.');
                 }
             }
         }
@@ -3219,9 +3501,10 @@
                     // Cerrar panel de edición
                     closeEditPanel();
                     
-                    // Mostrar modal de éxito
-                    showSuccessModal(
-                        '¡Anuncio Actualizado!', 
+                    // Mostrar alerta de éxito
+                    const alert = showCustomAlert(
+                        'success',
+                        '¡Anuncio Actualizado!',
                         'El anuncio se ha actualizado exitosamente. La página se recargará automáticamente.',
                         '✏️'
                     );
@@ -3230,19 +3513,21 @@
                     setTimeout(() => {
                         showLoadingOverlay('Actualizando...', 'La página se está recargando para mostrar los cambios...');
                         setTimeout(() => {
+                            sessionStorage.setItem('needsReload', 'true');
+                            sessionStorage.setItem('reloadMessage', 'Anuncio actualizado correctamente');
                             window.location.reload();
                         }, 2000);
                     }, 2000);
                     
                 } else {
-                    showMessage('Error al actualizar el anuncio. Intenta nuevamente.', 'error');
+                    showCustomAlert('error', 'Error', 'Error al actualizar el anuncio. Intenta nuevamente.');
                 }
             } else {
                 document.getElementById('saveEditText').textContent = 'Guardar Cambios';
                 document.getElementById('saveEditLoading').style.display = 'none';
                 document.getElementById('saveEditBtn').disabled = false;
                 isProcessing = false;
-                showMessage('El anuncio no se encontró.', 'error');
+                showCustomAlert('error', 'Error', 'El anuncio no se encontró.');
             }
         }
 
@@ -3293,7 +3578,7 @@
             if (announcement) {
                 // Convertir horas a formato 12h
                 const startTime = announcement.time ? convertTo12Hour(announcement.time) : 'No especificada';
-                const endTime = announcement.endTime ? convertTo12Hour(announcement.endTime) : 'No especificada';
+                const endTime = announcement.endTime ? convertTo12Hour(announcement.endTime) : null;
                 
                 // Generar contenido para archivos (solo información esencial)
                 let filesContent = '';
@@ -3321,7 +3606,7 @@
                     `;
                 }
                 
-                // Construir contenido del modal - SOLO INFORMACIÓN ESENCIAL
+                // Construir contenido del modal
                 const detailsContent = `
                     <div class="details-section">
                         <h4>Información del Anuncio</h4>
@@ -3447,33 +3732,45 @@
             
             if (isProcessing) return;
             
-            if (confirm('¿Estás seguro de que quieres eliminar este anuncio?')) {
-                isProcessing = true;
+            const confirmed = await showConfirmationDialog(
+                '¿Eliminar anuncio?',
+                '¿Estás seguro de que quieres eliminar este anuncio? Esta acción no se puede deshacer.',
+                'danger'
+            );
+            
+            if (!confirmed) {
+                return;
+            }
+            
+            isProcessing = true;
+            
+            // Mostrar overlay de carga
+            showLoadingOverlay('Eliminando anuncio...', 'Eliminando el anuncio seleccionado...');
+            
+            // Intentar eliminar de Firebase
+            const firebaseSuccess = await deleteAnnouncementFromFirebase(id);
+            
+            isProcessing = false;
+            hideLoadingOverlay();
+            
+            if (firebaseSuccess) {
+                // Mostrar alerta de éxito
+                const alert = showCustomAlert(
+                    'success',
+                    '¡Anuncio Eliminado!',
+                    'El anuncio se ha eliminado correctamente. La página se recargará automáticamente.',
+                    '🗑️'
+                );
                 
-                // Intentar eliminar de Firebase
-                const firebaseSuccess = await deleteAnnouncementFromFirebase(id);
+                // Forzar recarga completa después de 2 segundos
+                setTimeout(() => {
+                    sessionStorage.setItem('needsReload', 'true');
+                    sessionStorage.setItem('reloadMessage', 'Anuncio eliminado correctamente');
+                    window.location.reload();
+                }, 2000);
                 
-                isProcessing = false;
-                
-                if (firebaseSuccess) {
-                    // Mostrar modal de éxito
-                    showSuccessModal(
-                        '¡Anuncio Eliminado!', 
-                        'El anuncio se ha eliminado exitosamente. La página se recargará automáticamente.',
-                        '🗑️'
-                    );
-                    
-                    // Mostrar overlay de carga y recargar después de 2 segundos
-                    setTimeout(() => {
-                        showLoadingOverlay('Actualizando...', 'La página se está recargando para actualizar la lista de anuncios...');
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 2000);
-                    }, 2000);
-                    
-                } else {
-                    showMessage('Error al eliminar el anuncio. Intenta nuevamente.', 'error');
-                }
+            } else {
+                showCustomAlert('error', 'Error', 'Error al eliminar el anuncio. Intenta nuevamente.');
             }
         }
 
@@ -3591,7 +3888,7 @@
                 // Clases CSS para modo selección
                 const selectableClass = isSelectionMode ? 'selectable' : '';
                 const checkbox = isSelectionMode ? 
-                    `<input type="checkbox" class="announcement-checkbox" data-id="${announcement.id}" onclick="toggleAnnouncementSelection(${announcement.id})">` : 
+                    `<input type="checkbox" class="announcement-checkbox" data-id="${announcement.id}">` : 
                     '';
                 
                 adminAnnouncementsHTML += `
@@ -3638,6 +3935,16 @@
             
             adminAnnouncementsContainer.innerHTML = adminAnnouncementsHTML;
             
+            // Si estamos en modo selección, agregar event listeners a los checkboxes
+            if (isSelectionMode) {
+                document.querySelectorAll('.announcement-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => {
+                        const announcementId = parseInt(e.target.getAttribute('data-id'));
+                        toggleAnnouncementSelection(announcementId);
+                    });
+                });
+            }
+            
             // Actualizar UI de selección si estamos en modo selección
             if (isSelectionMode) {
                 updateSelectionUI();
@@ -3654,6 +3961,69 @@
             setTimeout(() => {
                 formMessage.style.display = 'none';
             }, 3000);
+        }
+
+        // Inicializar la aplicación
+        function initApp() {
+            // Verificar si hay mensaje de recarga
+            const reloadMessage = sessionStorage.getItem('reloadMessage');
+            if (reloadMessage) {
+                showCustomAlert('success', 'Operación completada', reloadMessage);
+                sessionStorage.removeItem('reloadMessage');
+            }
+            
+            // Verificar si necesitamos recargar
+            if (sessionStorage.getItem('needsReload') === 'true') {
+                sessionStorage.removeItem('needsReload');
+                showLoadingOverlay('Actualizando página...', 'La página se está recargando para mostrar los datos actualizados.');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+                return;
+            }
+            
+            // Establecer fecha mínima en los campos de fecha
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').min = today;
+            document.getElementById('endDate').min = today;
+            document.getElementById('editDate').min = today;
+            document.getElementById('editEndDate').min = today;
+            
+            // Generar un ID único para el dispositivo
+            if (!localStorage.getItem('deviceId')) {
+                deviceId = 'device_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+                localStorage.setItem('deviceId', deviceId);
+            } else {
+                deviceId = localStorage.getItem('deviceId');
+            }
+            
+            // Generar un ID único para el usuario actual (si no existe)
+            if (!localStorage.getItem('currentUserId')) {
+                const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('currentUserId', userId);
+            }
+            
+            currentUser = localStorage.getItem('currentUserId');
+            
+            // Mostrar estado de conexión
+            syncStatus.style.display = 'block';
+            syncStatusText.textContent = 'Conectando con la base de datos...';
+            
+            // Cargar anuncios desde Firebase
+            loadAnnouncementsFromFirebase();
+            
+            // Verificar si hay sesión de administrador activa
+            const adminSession = localStorage.getItem('adminSession');
+            if (adminSession === 'active') {
+                isAdminLoggedIn = true;
+                updateLoginUI();
+            }
+            
+            // Configurar event listeners
+            setupEventListeners();
+            
+            // Mostrar vista inicial
+            showView('departmentSelection');
         }
 
         // Inicializar la aplicación cuando se carga la página
