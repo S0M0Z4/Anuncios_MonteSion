@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gestor-anuncios-v1';
+const CACHE_NAME = 'gestor-anuncios-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -27,7 +27,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
 
-  // No interceptar Firebase, Google APIs ni recursos externos.
+  // Firebase y los módulos externos continúan conectándose directamente a Internet.
   if (requestUrl.origin !== self.location.origin || event.request.method !== 'GET') return;
 
   if (event.request.mode === 'navigate') {
