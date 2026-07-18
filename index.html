@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Anuncios - Iglesia</title>
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="description" content="Sistema responsivo para publicar y administrar anuncios de la iglesia.">
+    <meta name="application-name" content="Gestor de Anuncios - Iglesia">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Anuncios Iglesia">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icon/icon-192.png">
+    <link rel="apple-touch-icon" href="./icon/apple-touch-icon.png">
+    <link rel="stylesheet" href="./assets/bootstrap-icons.min.css">
     <style>
         /* Estilos generales */
         :root {
@@ -788,7 +798,7 @@
         }
         
         .selection-info::before {
-            content: '📋';
+            content: '';
             font-size: 1.2rem;
         }
         
@@ -1743,6 +1753,457 @@
         }
     </style>
     
+
+    <style>
+        /* Diseño moderno y responsivo; conserva la paleta original */
+        html { scroll-behavior: smooth; }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(59, 130, 246, 0.14), transparent 34rem),
+                radial-gradient(circle at bottom right, rgba(30, 58, 138, 0.10), transparent 30rem),
+                var(--gris-claro);
+            overflow-x: hidden;
+        }
+
+        button, input, textarea, select { font: inherit; }
+        button { -webkit-tap-highlight-color: transparent; }
+        button i, .cloud-info i, .connection-status i { line-height: 1; }
+
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 1200;
+            padding: 0;
+            background: linear-gradient(135deg, var(--azul-principal), #172554);
+            border-bottom: 1px solid rgba(255,255,255,.12);
+        }
+
+        .header-inner {
+            width: min(100% - 2rem, 1240px);
+            min-height: 78px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.25rem;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: .8rem;
+            color: var(--blanco);
+            text-decoration: none;
+            min-width: 0;
+        }
+
+        .brand-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 15px;
+            object-fit: cover;
+            background: var(--blanco);
+            box-shadow: 0 10px 22px rgba(0,0,0,.18);
+            flex: 0 0 auto;
+        }
+
+        .brand-copy { display: grid; line-height: 1.12; }
+        .brand-copy strong { font-size: 1.08rem; letter-spacing: -.01em; }
+        .brand-copy small { margin-top: .22rem; color: #bfdbfe; font-size: .8rem; }
+
+        .header-actions, .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: .6rem;
+        }
+
+        .login-container { position: relative; flex-wrap: nowrap; }
+
+        .login-btn, .admin-view-btn, .logout-btn, .install-btn, .back-btn,
+        .submit-btn, .btn-submit-announcement, .multi-delete-btn,
+        .select-all-btn, .delete-selected-btn, .cancel-selection-btn,
+        .file-input-label, .preview-download-btn, .alert-btn,
+        .dialog-cancel, .dialog-confirm {
+            min-height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            border-radius: 10px;
+            font-weight: 650;
+            line-height: 1;
+            transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease;
+        }
+
+        .login-btn, .install-btn {
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.24);
+            color: var(--blanco);
+        }
+
+        .install-btn { padding: .65rem 1rem; cursor: pointer; }
+        .install-btn:hover, .login-btn:hover { background: rgba(255,255,255,.20); transform: translateY(-1px); }
+        .admin-view-btn { background: var(--verde); }
+        .logout-btn { background: var(--rojo); }
+
+        .login-form {
+            top: calc(100% + .8rem);
+            width: min(340px, calc(100vw - 2rem));
+            padding: 1.25rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            box-shadow: 0 22px 55px rgba(15,23,42,.22);
+        }
+
+        .login-form-heading {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .login-form-heading > i {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            color: var(--azul-principal);
+            background: var(--azul-claro);
+            font-size: 1.2rem;
+        }
+
+        .login-form-heading h3 { margin: 0; text-align: left; }
+        .login-form-heading p { margin: .2rem 0 0; color: #6b7280; font-size: .82rem; }
+
+        .input-with-icon { position: relative; }
+        .input-with-icon > i {
+            position: absolute;
+            top: 50%;
+            left: .75rem;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none;
+        }
+        .input-with-icon input { padding-left: 2.35rem; }
+
+        .container {
+            width: min(100% - 2rem, 1240px);
+            max-width: none;
+            margin: 1.5rem auto 2.25rem;
+            padding: 0;
+        }
+
+        .welcome-message, .selection-screen, .announcement-form-section,
+        .announcements-section, .admin-panel {
+            width: 100%;
+            border: 1px solid rgba(148,163,184,.25);
+            border-radius: 20px;
+            box-shadow: 0 18px 45px rgba(30,58,138,.08);
+        }
+
+        .welcome-message {
+            position: relative;
+            overflow: hidden;
+            padding: clamp(1.5rem, 4vw, 2.6rem);
+            background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+        }
+
+        .welcome-message::after {
+            content: '';
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            right: -80px;
+            top: -100px;
+            border-radius: 50%;
+            background: rgba(59,130,246,.12);
+        }
+
+        .welcome-message h2 {
+            position: relative;
+            z-index: 1;
+            margin-bottom: .55rem;
+            font-size: clamp(1.45rem, 3vw, 2rem);
+            letter-spacing: -.025em;
+        }
+
+        .welcome-message p { position: relative; z-index: 1; }
+
+        .selection-screen, .announcement-form-section, .announcements-section, .admin-panel {
+            padding: clamp(1rem, 3vw, 1.65rem);
+        }
+
+        .step-nav {
+            display: grid;
+            grid-template-columns: minmax(110px, auto) 1fr minmax(110px, auto);
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .step-title { margin: 0; font-size: clamp(1.2rem, 2.5vw, 1.55rem); }
+        .back-btn { justify-self: start; }
+        .step-nav > :last-child:not(.step-title) { justify-self: end; }
+
+        .departments-grid, .option-cards, .subcategories-grid {
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+            gap: 1rem;
+        }
+
+        .department-card, .option-card, .subcategory-card {
+            min-height: 154px;
+            padding: 1.25rem;
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            background: #fff !important;
+            box-shadow: 0 8px 22px rgba(30,58,138,.06);
+        }
+
+        .department-card:hover, .option-card:hover, .subcategory-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--azul-secundario);
+            box-shadow: 0 14px 32px rgba(30,58,138,.13);
+        }
+
+        .department-icon, .option-icon {
+            width: 54px;
+            height: 54px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto .8rem;
+            border-radius: 16px;
+            background: var(--azul-claro);
+            color: var(--azul-principal);
+            font-size: 1.55rem;
+        }
+
+        .department-card h3, .option-card h4, .subcategory-card h4 { text-align: center; }
+        .department-card p, .option-card p, .subcategory-card p { text-align: center; color: #64748b; }
+
+        .cloud-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .65rem;
+            margin-top: 1.2rem;
+            border: 1px solid #bfdbfe;
+        }
+
+        .announcement-form {
+            width: min(100%, 920px);
+            margin: 0 auto;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .form-control label, .form-group label { color: #334155; font-weight: 650; }
+        .required-mark { color: var(--rojo); }
+
+        .form-control input, .form-control select, .form-control textarea,
+        .form-group input {
+            min-height: 48px;
+            border: 1px solid #cbd5e1;
+            border-radius: 11px;
+            background: #fff;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .form-control textarea { min-height: 130px; }
+        .form-control input:focus, .form-control select:focus, .form-control textarea:focus,
+        .form-group input:focus {
+            border-color: var(--azul-secundario);
+            box-shadow: 0 0 0 4px rgba(59,130,246,.13);
+        }
+
+        .file-upload-area {
+            border-color: #93c5fd;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #f8fbff, #eff6ff);
+        }
+
+        .file-upload-icon {
+            width: 64px;
+            height: 64px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 1rem;
+            border-radius: 18px;
+            color: var(--azul-principal);
+            background: var(--azul-claro);
+            font-size: 1.8rem;
+        }
+
+        .file-success-message { align-items: center; justify-content: center; gap: .5rem; }
+        .btn-submit-announcement { min-height: 50px; }
+
+        .instructions {
+            width: min(100%, 920px);
+            margin: 1.25rem auto 0;
+            border-radius: 14px;
+            border-color: #dbeafe;
+            background: #f8fbff;
+        }
+
+        .announcements-container, .admin-announcements {
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
+        }
+
+        .announcement-card {
+            overflow: hidden;
+            border: 1px solid #dbeafe;
+            border-left: 5px solid var(--azul-principal);
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 10px 25px rgba(30,58,138,.07);
+        }
+
+        .announcement-card h3 { text-align: left; }
+        .announcement-category { border-radius: 999px; }
+        .announcement-meta span { display: flex; align-items: center; gap: .3rem; }
+
+        .action-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            font-size: .95rem;
+        }
+
+        .current-department { border: 1px solid #bfdbfe; border-radius: 14px; }
+        .selection-info::before { content: none; }
+
+        .details-content, .edit-form {
+            border: 1px solid rgba(255,255,255,.3);
+            border-radius: 18px;
+            box-shadow: 0 28px 70px rgba(15,23,42,.28);
+        }
+
+        .details-header { background: linear-gradient(135deg, var(--azul-principal), #172554); }
+        .details-close, .close-btn { display: grid; place-items: center; border-radius: 9px; }
+
+        .custom-alert { padding: 1rem; backdrop-filter: blur(4px); }
+        .alert-content {
+            padding: 1.6rem;
+            border-radius: 18px;
+            animation: alertPop .25s ease;
+        }
+        .alert-content h3 { margin-bottom: .65rem; }
+        .alert-content p { margin-bottom: 1.4rem; }
+        .alert-icon {
+            width: 66px;
+            height: 66px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: var(--azul-claro);
+            color: var(--azul-principal);
+            font-size: 2rem;
+        }
+        .alert-content.success .alert-icon { color: #047857; background: #d1fae5; }
+        .alert-content.error .alert-icon, .alert-content.danger .alert-icon { color: #b91c1c; background: #fee2e2; }
+        .alert-content.warning .alert-icon { color: #b45309; background: #fef3c7; }
+        .dialog-actions { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+        .dialog-cancel { border: 1px solid #cbd5e1; color: #334155; background: #f8fafc; }
+        .dialog-confirm { border: 0; color: #fff; background: var(--rojo); }
+
+        .loading-overlay-icon { animation: spin 1.1s linear infinite; }
+        .loading-overlay-icon i { display: block; }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+            bottom: 14px;
+            right: 14px;
+            border-radius: 999px;
+            font-weight: 650;
+        }
+
+        .app-footer {
+            width: 100%;
+            background: #172554;
+            color: #dbeafe;
+        }
+        .app-footer-inner {
+            width: min(100% - 2rem, 1240px);
+            min-height: 72px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: .88rem;
+        }
+        .app-footer-inner span { display: inline-flex; align-items: center; gap: .5rem; }
+
+        @keyframes alertPop {
+            from { opacity: 0; transform: translateY(14px) scale(.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @media (max-width: 900px) {
+            .header-inner { min-height: 72px; }
+            .brand-copy strong { font-size: .98rem; }
+            .header-actions { gap: .4rem; }
+            .login-btn span, .admin-view-btn span, .logout-btn span, .install-btn span { display: none; }
+            .login-btn, .admin-view-btn, .logout-btn, .install-btn { width: 44px; padding: 0; }
+            .step-nav { grid-template-columns: auto 1fr auto; }
+        }
+
+        @media (max-width: 768px) {
+            .app-header { position: relative; }
+            .header-inner {
+                width: min(100% - 1rem, 1240px);
+                padding: .7rem 0;
+                flex-direction: row;
+                text-align: left;
+            }
+            .brand { flex-direction: row; margin: 0; }
+            .brand-logo { width: 46px; height: 46px; border-radius: 13px; }
+            .login-container { width: auto; justify-content: flex-end; flex-wrap: nowrap; }
+            .login-form { position: fixed; top: 50%; right: auto; }
+
+            .container { width: min(100% - 1rem, 1240px); margin-top: .8rem; }
+            .welcome-message { margin-bottom: .8rem; }
+            .selection-screen, .announcement-form-section, .announcements-section, .admin-panel { padding: 1rem; }
+
+            .step-nav {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: center;
+                gap: .7rem;
+            }
+            .step-title { width: 100%; order: -1; text-align: center; }
+            .back-btn { align-self: auto; order: initial; }
+            .step-nav > :last-child:not(.step-title) { margin-left: auto; }
+
+            .announcement-form { grid-template-columns: 1fr; }
+            .full-width, .file-upload-container, .btn-submit-announcement { grid-column: 1; }
+            .file-upload-area { padding: 1.35rem .9rem; }
+            .announcement-actions { position: absolute; top: .8rem; right: .8rem; margin: 0; }
+            .announcement-card h3 { padding-right: 112px; }
+
+            .app-footer-inner { min-height: 86px; padding: 1rem 0; flex-direction: column; justify-content: center; text-align: center; }
+            .connection-status { left: 50%; right: auto; transform: translateX(-50%); white-space: nowrap; }
+        }
+
+        @media (max-width: 480px) {
+            .brand-copy strong { font-size: .88rem; }
+            .brand-copy small { font-size: .72rem; }
+            .header-actions { gap: .35rem; }
+            .login-btn, .admin-view-btn, .logout-btn, .install-btn { width: 40px; min-height: 40px; }
+            .departments-grid, .option-cards, .subcategories-grid { grid-template-columns: 1fr; }
+            .department-card, .option-card, .subcategory-card { min-height: 135px; }
+            .selection-actions { display: grid; grid-template-columns: 1fr; width: 100%; }
+            .dialog-actions { grid-template-columns: 1fr; }
+        }
+    </style>
+
     <!-- Firebase SDK version 12.7.0 -->
     <script type="module">
         // Import Firebase modules
@@ -1775,35 +2236,72 @@
     </script>
 </head>
 <body>
-    <!-- Encabezado con login -->
-    <header class="header">
-        <div class="logo">
-            <div class="logo-icon">⛪</div>
-            <h1>Gestor de Anuncios - Iglesia</h1>
-        </div>
-        <div class="login-container">
-            <button id="loginBtn" class="login-btn">Iniciar Sesión</button>
-            <div id="loginForm" class="login-form">
-                <h3>Acceso Administrador</h3>
-                <div class="form-group">
-                    <label for="username">Usuario:</label>
-                    <input type="text" id="username" placeholder="Ingresa tu usuario" autocomplete="off">
+    <!-- Encabezado principal -->
+    <header class="header app-header">
+        <div class="header-inner">
+            <a class="brand" href="./" aria-label="Ir al inicio">
+                <img src="./icon/logo.png" alt="Logo del Gestor de Anuncios" class="brand-logo">
+                <span class="brand-copy">
+                    <strong>Gestor de Anuncios</strong>
+                    <small>Iglesia</small>
+                </span>
+            </a>
+
+            <div class="header-actions">
+                <button id="installBtn" class="install-btn" type="button" hidden>
+                    <i class="bi bi-download" aria-hidden="true"></i>
+                    <span>Instalar</span>
+                </button>
+
+                <div class="login-container">
+                    <button id="loginBtn" class="login-btn" type="button">
+                        <i class="bi bi-shield-lock" aria-hidden="true"></i>
+                        <span>Iniciar sesión</span>
+                    </button>
+                    <div id="loginForm" class="login-form">
+                        <div class="login-form-heading">
+                            <i class="bi bi-shield-lock" aria-hidden="true"></i>
+                            <div>
+                                <h3>Acceso administrador</h3>
+                                <p>Ingresa tus credenciales</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="username">Usuario</label>
+                            <div class="input-with-icon">
+                                <i class="bi bi-person" aria-hidden="true"></i>
+                                <input type="text" id="username" placeholder="Ingresa tu usuario" autocomplete="username">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Contraseña</label>
+                            <div class="input-with-icon">
+                                <i class="bi bi-key" aria-hidden="true"></i>
+                                <input type="password" id="password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
+                            </div>
+                        </div>
+                        <button id="submitLogin" class="submit-btn" type="button">
+                            <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+                            Ingresar
+                        </button>
+                    </div>
+                    <button id="logoutBtn" class="logout-btn" type="button">
+                        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                        <span>Cerrar sesión</span>
+                    </button>
+                    <button id="adminViewBtn" class="admin-view-btn" type="button" style="display: none;">
+                        <i class="bi bi-speedometer2" aria-hidden="true"></i>
+                        <span>Vista admin</span>
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label for="password">Contraseña:</label>
-                    <input type="password" id="password" placeholder="Ingresa tu contraseña" autocomplete="off">
-                </div>
-                <button id="submitLogin" class="submit-btn">Ingresar</button>
             </div>
-            <button id="logoutBtn" class="logout-btn">Cerrar Sesión</button>
-            <button id="adminViewBtn" class="admin-view-btn" style="display: none;">Vista Admin</button>
         </div>
     </header>
 
     <!-- Overlay de carga -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-overlay-content">
-            <div class="loading-overlay-icon">⏳</div>
+            <div class="loading-overlay-icon"><i class="bi bi-arrow-repeat" aria-hidden="true"></i></div>
             <h3 id="loadingTitle">Cargando...</h3>
             <p id="loadingMessage">Por favor espera mientras se actualiza la página.</p>
             <div class="loading" style="margin: 1rem auto;"></div>
@@ -1827,125 +2325,125 @@
         <!-- Pantalla de selección de departamento principal -->
         <section id="departmentSelection" class="selection-screen">
             <div class="step-nav">
-                <button id="backBtn" class="back-btn" style="display: none;">← Volver</button>
+                <button id="backBtn" class="back-btn" style="display: none;"><i class="bi bi-arrow-left" aria-hidden="true"></i><span>Volver</span></button>
                 <h2 class="step-title">Selecciona tu Departamento o Ministerio</h2>
             </div>
             <div class="departments-grid">
                 <!-- Ministerio Joven -->
                 <div class="department-card juvenil" data-department="Ministerio Joven">
-                    <div class="department-icon">👨‍🎓</div>
+                    <div class="department-icon"><i class="bi bi-people" aria-hidden="true"></i></div>
                     <h3>Ministerio Joven</h3>
                     <p>JA y Clubes (Aventureros, Conquistadores, Guías)</p>
                 </div>
                 
                 <!-- Ministerio Infantil -->
                 <div class="department-card" data-department="Ministerio Infantil">
-                    <div class="department-icon">👶</div>
+                    <div class="department-icon"><i class="bi bi-emoji-smile" aria-hidden="true"></i></div>
                     <h3>Ministerio Infantil</h3>
                     <p>Anuncios para niños</p>
                 </div>
                 
                 <!-- Escuela Sabática -->
                 <div class="department-card" data-department="Escuela Sabática">
-                    <div class="department-icon">📚</div>
+                    <div class="department-icon"><i class="bi bi-book" aria-hidden="true"></i></div>
                     <h3>Escuela Sabática</h3>
                     <p>Clases y estudios bíblicos</p>
                 </div>
                 
                 <!-- Ministerio Personal -->
                 <div class="department-card" data-department="Ministerio Personal">
-                    <div class="department-icon">🙏</div>
+                    <div class="department-icon"><i class="bi bi-stars" aria-hidden="true"></i></div>
                     <h3>Ministerio Personal</h3>
                     <p>Crecimiento espiritual</p>
                 </div>
                 
                 <!-- Ministerio de la Mujer -->
                 <div class="department-card" data-department="Ministerio de la Mujer">
-                    <div class="department-icon">👩</div>
+                    <div class="department-icon"><i class="bi bi-person" aria-hidden="true"></i></div>
                     <h3>Ministerio de la Mujer</h3>
                     <p>Actividades para mujeres</p>
                 </div>
                 
                 <!-- Ministerio de la Familia -->
                 <div class="department-card" data-department="Ministerio de la Familia">
-                    <div class="department-icon">👨‍👩‍👧‍👦</div>
+                    <div class="department-icon"><i class="bi bi-people-fill" aria-hidden="true"></i></div>
                     <h3>Ministerio de la Familia</h3>
                     <p>Anuncios familiares</p>
                 </div>
                 
                 <!-- Mayordomía Cristiana -->
                 <div class="department-card" data-department="Mayordomía Cristiana">
-                    <div class="department-icon">💼</div>
+                    <div class="department-icon"><i class="bi bi-briefcase" aria-hidden="true"></i></div>
                     <h3>Mayordomía Cristiana</h3>
                     <p>Administración y recursos</p>
                 </div>
                 
                 <!-- Ministerio de Salud -->
                 <div class="department-card" data-department="Ministerio de Salud">
-                    <div class="department-icon">🏥</div>
+                    <div class="department-icon"><i class="bi bi-heart" aria-hidden="true"></i></div>
                     <h3>Ministerio de Salud</h3>
                     <p>Salud y bienestar</p>
                 </div>
                 
                 <!-- Comunicación -->
                 <div class="department-card" data-department="Comunicación">
-                    <div class="department-icon">📢</div>
+                    <div class="department-icon"><i class="bi bi-megaphone" aria-hidden="true"></i></div>
                     <h3>Comunicación</h3>
                     <p>Medios y difusión</p>
                 </div>
                 
                 <!-- Director de Canto -->
                 <div class="department-card" data-department="Director de Canto">
-                    <div class="department-icon">🎤</div>
+                    <div class="department-icon"><i class="bi bi-mic" aria-hidden="true"></i></div>
                     <h3>Director de Canto</h3>
                     <p>Alabanza y música</p>
                 </div>
                 
                 <!-- Director de Sonido -->
                 <div class="department-card" data-department="Director de Sonido">
-                    <div class="department-icon">🎧</div>
+                    <div class="department-icon"><i class="bi bi-headphones" aria-hidden="true"></i></div>
                     <h3>Director de Sonido</h3>
                     <p>Audiovisual y sonido</p>
                 </div>
                 
                 <!-- Dorcas -->
                 <div class="department-card" data-department="Dorcas">
-                    <div class="department-icon">❤️</div>
+                    <div class="department-icon"><i class="bi bi-heart" aria-hidden="true"></i></div>
                     <h3>Dorcas</h3>
                     <p>Servicio y ayuda social</p>
                 </div>
                 
                 <!-- Libertad Religiosa -->
                 <div class="department-card" data-department="Libertad Religiosa">
-                    <div class="department-icon">⚖️</div>
+                    <div class="department-icon"><i class="bi bi-bank" aria-hidden="true"></i></div>
                     <h3>Libertad Religiosa</h3>
                     <p>Derechos y libertades</p>
                 </div>
                 
                 <!-- Diáconos y Diaconisas -->
                 <div class="department-card" data-department="Diáconos y Diaconisas">
-                    <div class="department-icon">👨‍💼</div>
+                    <div class="department-icon"><i class="bi bi-person-badge" aria-hidden="true"></i></div>
                     <h3>Diáconos y Diaconisas</h3>
                     <p>Servicio en la iglesia</p>
                 </div>
                 
                 <!-- Ancianos de Iglesia -->
                 <div class="department-card" data-department="Ancianos de Iglesia">
-                    <div class="department-icon">👴</div>
+                    <div class="department-icon"><i class="bi bi-person-check" aria-hidden="true"></i></div>
                     <h3>Ancianos de Iglesia</h3>
                     <p>Consejo de ancianos</p>
                 </div>
                 
                 <!-- Secretaría -->
                 <div class="department-card" data-department="Secretaría de Iglesia">
-                    <div class="department-icon">📝</div>
+                    <div class="department-icon"><i class="bi bi-journal-text" aria-hidden="true"></i></div>
                     <h3>Secretaría de Iglesia</h3>
                     <p>Documentación y registros</p>
                 </div>
                 
                 <!-- Tesorería -->
                 <div class="department-card" data-department="Tesoreria">
-                    <div class="department-icon">💰</div>
+                    <div class="department-icon"><i class="bi bi-cash-coin" aria-hidden="true"></i></div>
                     <h3>Tesoreria</h3>
                     <p>Finanzas de la iglesia</p>
                 </div>
@@ -1953,24 +2451,25 @@
             
             <!-- Información de la nube -->
             <div class="cloud-info">
-                ℹ️ Los anuncios se guardan automáticamente en la nube. El administrador puede ver todos los anuncios desde cualquier dispositivo.
+                <i class="bi bi-cloud-check" aria-hidden="true"></i>
+                <span>Los anuncios se guardan automáticamente en la nube. El administrador puede verlos desde cualquier dispositivo.</span>
             </div>
         </section>
 
         <!-- Pantalla de selección Ministerio Joven (JA o Clubes) -->
         <section id="juvenilSelection" class="selection-screen" style="display: none;">
             <div class="step-nav">
-                <button id="backToDepartmentsBtn" class="back-btn">← Volver</button>
+                <button id="backToDepartmentsBtn" class="back-btn"><i class="bi bi-arrow-left" aria-hidden="true"></i><span>Volver</span></button>
                 <h2 class="step-title">Ministerio Joven - Selecciona una opción</h2>
             </div>
             <div class="option-cards">
                 <div class="option-card ja" data-option="JA">
-                    <div class="option-icon">🙋‍♂️</div>
+                    <div class="option-icon"><i class="bi bi-person-plus" aria-hidden="true"></i></div>
                     <h4>Jóvenes Adventistas (JA)</h4>
                     <p>Anuncios para jóvenes de 16+ años</p>
                 </div>
                 <div class="option-card clubes" data-option="Clubes">
-                    <div class="option-icon">🏕️</div>
+                    <div class="option-icon"><i class="bi bi-signpost-split" aria-hidden="true"></i></div>
                     <h4>Clubes</h4>
                     <p>Aventureros, Conquistadores, Guías Mayores</p>
                 </div>
@@ -1980,22 +2479,22 @@
         <!-- Pantalla de selección de Clubes -->
         <section id="clubesSelection" class="selection-screen" style="display: none;">
             <div class="step-nav">
-                <button id="backToJuvenilBtn" class="back-btn">← Volver</button>
+                <button id="backToJuvenilBtn" class="back-btn"><i class="bi bi-arrow-left" aria-hidden="true"></i><span>Volver</span></button>
                 <h2 class="step-title">Clubes - Selecciona un club</h2>
             </div>
             <div class="subcategories-grid">
                 <div class="subcategory-card" data-department="Aventureros">
-                    <div class="option-icon">🧒</div>
+                    <div class="option-icon"><i class="bi bi-emoji-smile" aria-hidden="true"></i></div>
                     <h4>Aventureros</h4>
                     <p>Niños 6-9 años</p>
                 </div>
                 <div class="subcategory-card" data-department="Conquistadores">
-                    <div class="option-icon">🧑</div>
+                    <div class="option-icon"><i class="bi bi-person" aria-hidden="true"></i></div>
                     <h4>Conquistadores</h4>
                     <p>Jóvenes 10-15 años</p>
                 </div>
                 <div class="subcategory-card" data-department="Guías Mayores">
-                    <div class="option-icon">👨‍🎓</div>
+                    <div class="option-icon"><i class="bi bi-people" aria-hidden="true"></i></div>
                     <h4>Guías Mayores</h4>
                     <p>Jóvenes 16-21 años</p>
                 </div>
@@ -2005,21 +2504,21 @@
         <!-- Sección de formulario de anuncios -->
         <section id="announcementFormSection" class="announcement-form-section">
             <div class="step-nav">
-                <button id="backToSelectionBtn" class="back-btn">← Volver</button>
+                <button id="backToSelectionBtn" class="back-btn"><i class="bi bi-arrow-left" aria-hidden="true"></i><span>Volver</span></button>
                 <h2 class="step-title" id="formSectionTitle">Crear Nuevo Anuncio</h2>
             </div>
             <form id="announcementForm" class="announcement-form">
                 <input type="hidden" id="selectedDepartment">
                 <div class="form-control">
-                    <label for="time">Hora de inicio (opcional):</label>
-                    <input type="time" id="time">
+                    <label for="time">Hora de inicio <span class="required-mark">*</span></label>
+                    <input type="time" id="time" required>
                 </div>
                 <div class="form-control">
                     <label for="endTime">Hora de fin (opcional):</label>
                     <input type="time" id="endTime">
                 </div>
                 <div class="form-control">
-                    <label for="date">Fecha de inicio:</label>
+                    <label for="date">Fecha de inicio <span class="required-mark">*</span></label>
                     <input type="date" id="date" required>
                 </div>
                 <div class="form-control">
@@ -2048,7 +2547,7 @@
                         </span>
                     </label>
                     <div class="file-upload-area" id="fileUploadArea">
-                        <div class="file-upload-icon">📎</div>
+                        <div class="file-upload-icon"><i class="bi bi-cloud-arrow-up" aria-hidden="true"></i></div>
                         <div class="file-upload-text">
                             Arrastra y suelta archivos aquí o haz clic para seleccionarlos
                         </div>
@@ -2060,7 +2559,7 @@
                     
                     <!-- Mensaje de éxito -->
                     <div class="file-success-message" id="fileSuccessMessage">
-                        ✅ Archivo subido con éxito
+                        <i class="bi bi-check-circle" aria-hidden="true"></i> Archivo agregado correctamente
                     </div>
                     
                     <!-- Lista de archivos -->
@@ -2073,7 +2572,7 @@
                 </div>
                 
                 <button type="submit" class="btn-submit-announcement" id="submitAnnouncementBtn">
-                    <span id="submitBtnText">Publicar Anuncio</span>
+                    <i class="bi bi-send" aria-hidden="true"></i><span id="submitBtnText">Publicar anuncio</span>
                     <span id="submitLoading" class="loading" style="display: none;"></span>
                 </button>
             </form>
@@ -2095,9 +2594,9 @@
         <!-- Sección para mostrar anuncios del departamento -->
         <section id="announcementsSection" class="announcements-section">
             <div class="step-nav">
-                <button id="backToAnnouncementsBtn" class="back-btn">← Volver</button>
+                <button id="backToAnnouncementsBtn" class="back-btn"><i class="bi bi-arrow-left" aria-hidden="true"></i><span>Volver</span></button>
                 <h2 class="step-title" id="currentDepartmentTitle">Anuncios del Departamento</h2>
-                <button id="createAnnouncementBtn" class="submit-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">+ Crear Anuncio</button>
+                <button id="createAnnouncementBtn" class="submit-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;"><i class="bi bi-plus-lg" aria-hidden="true"></i> Crear anuncio</button>
             </div>
             <div id="announcementsContainer" class="announcements-container">
                 <!-- Los anuncios se cargarán aquí dinámicamente -->
@@ -2110,13 +2609,13 @@
         <!-- Panel de administrador -->
         <section id="adminPanel" class="admin-panel">
             <div class="step-nav">
-                <button id="backToMainFromAdminBtn" class="back-btn">← Volver</button>
+                <button id="backToMainFromAdminBtn" class="back-btn"><i class="bi bi-arrow-left" aria-hidden="true"></i><span>Volver</span></button>
                 <h2 class="step-title">Panel de Administrador - Todos los Anuncios</h2>
                 <div style="display: flex; gap: 0.5rem;">
                     <button id="multiDeleteBtn" class="multi-delete-btn" style="display: none;">
-                        🗑️ Eliminar Varios
+                        <i class="bi bi-trash" aria-hidden="true"></i> Eliminar varios
                     </button>
-                    <button id="refreshCloudBtn" class="submit-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; background-color: var(--verde);">🔄 Actualizar</button>
+                    <button id="refreshCloudBtn" class="submit-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; background-color: var(--verde);"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Actualizar</button>
                 </div>
             </div>
             
@@ -2147,12 +2646,20 @@
         </section>
     </main>
 
+
+    <footer class="app-footer">
+        <div class="app-footer-inner">
+            <span><i class="bi bi-heart" aria-hidden="true"></i> Hecho para servir y comunicar con excelencia.</span>
+            <span><i class="bi bi-phone" aria-hidden="true"></i> Instalable en teléfono y computadora.</span>
+        </div>
+    </footer>
+
     <!-- Modal de detalles para administrador -->
     <div id="detailsModal" class="details-modal">
         <div class="details-content">
             <div class="details-header">
                 <h3>Detalles del Anuncio</h3>
-                <button id="closeDetailsBtn" class="details-close">×</button>
+                <button id="closeDetailsBtn" class="details-close" aria-label="Cerrar"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
             </div>
             <div class="details-body" id="detailsBody">
                 <!-- Los detalles se cargarán aquí dinámicamente -->
@@ -2165,7 +2672,7 @@
         <div class="edit-form">
             <div class="edit-header">
                 <h3>Editar Anuncio</h3>
-                <button id="closeEditBtn" class="close-btn">×</button>
+                <button id="closeEditBtn" class="close-btn" aria-label="Cerrar"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
             </div>
             <form id="editAnnouncementForm">
                 <input type="hidden" id="editId">
@@ -2176,15 +2683,15 @@
                         <input type="text" id="editDepartment" readonly style="background-color: #f3f4f6;">
                     </div>
                     <div class="form-control">
-                        <label for="editTime">Hora de inicio (opcional):</label>
-                        <input type="time" id="editTime">
+                        <label for="editTime">Hora de inicio <span class="required-mark">*</span></label>
+                        <input type="time" id="editTime" required>
                     </div>
                     <div class="form-control">
                         <label for="editEndTime">Hora de fin (opcional):</label>
                         <input type="time" id="editEndTime">
                     </div>
                     <div class="form-control">
-                        <label for="editDate">Fecha de inicio:</label>
+                        <label for="editDate">Fecha de inicio <span class="required-mark">*</span></label>
                         <input type="date" id="editDate" required>
                     </div>
                     <div class="form-control">
@@ -2205,7 +2712,7 @@
                     </div>
                     <div class="form-control" style="grid-column: 1 / -1; display: flex; gap: 1rem;">
                         <button type="submit" class="btn-submit-announcement" style="flex: 1;" id="saveEditBtn">
-                            <span id="saveEditText">Guardar Cambios</span>
+                            <i class="bi bi-save" aria-hidden="true"></i><span id="saveEditText">Guardar cambios</span>
                             <span id="saveEditLoading" class="loading" style="display: none;"></span>
                         </button>
                         <button type="button" id="cancelEditBtn" class="btn-submit-announcement" style="background-color: var(--gris); flex: 1;">Cancelar</button>
@@ -2218,7 +2725,7 @@
     <!-- Modal de éxito -->
     <div id="successModal" class="success-modal">
         <div class="success-modal-content">
-            <div class="success-icon" id="successIcon">✓</div>
+            <div class="success-icon" id="successIcon"><i class="bi bi-check-circle" aria-hidden="true"></i></div>
             <h3 id="successTitle">¡Operación Exitosa!</h3>
             <p id="successMessage">La operación se completó correctamente.</p>
             <button id="closeSuccessModal" class="submit-btn">Aceptar</button>
@@ -2227,7 +2734,7 @@
 
     <!-- Estado de conexión -->
     <div id="connectionStatus" class="connection-status">
-        <span id="connectionStatusText">Conectando...</span>
+        <span id="connectionStatusText"><i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> Conectando...</span>
     </div>
 
     <script>
@@ -2321,15 +2828,16 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // Función para obtener icono según tipo de archivo
+        // Función para obtener icono Bootstrap según el tipo de archivo
         function getFileIcon(fileType) {
-            if (fileType.startsWith('image/')) return '🖼️';
-            if (fileType.startsWith('video/')) return '🎬';
-            if (fileType === 'application/pdf') return '📄';
-            if (fileType.includes('word') || fileType.includes('document')) return '📝';
-            if (fileType.includes('excel') || fileType.includes('spreadsheet')) return '📊';
-            if (fileType.includes('powerpoint') || fileType.includes('presentation')) return '📽️';
-            return '📎';
+            let iconClass = 'bi-paperclip';
+            if (fileType.startsWith('image/')) iconClass = 'bi-file-earmark-image';
+            else if (fileType.startsWith('video/')) iconClass = 'bi-file-earmark-play';
+            else if (fileType === 'application/pdf') iconClass = 'bi-file-earmark-pdf';
+            else if (fileType.includes('word') || fileType.includes('document')) iconClass = 'bi-file-earmark-word';
+            else if (fileType.includes('excel') || fileType.includes('spreadsheet')) iconClass = 'bi-file-earmark-excel';
+            else if (fileType.includes('powerpoint') || fileType.includes('presentation')) iconClass = 'bi-file-earmark-slides';
+            return `<i class="bi ${iconClass}" aria-hidden="true"></i>`;
         }
 
         // Función para obtener nombre del tipo de archivo
@@ -2359,10 +2867,10 @@
         function updateConnectionStatus(connected) {
             if (connected) {
                 connectionStatus.className = 'connection-status online';
-                connectionStatusText.textContent = '✅ Conectado a la nube';
+                connectionStatusText.innerHTML = '<i class="bi bi-cloud-check" aria-hidden="true"></i> Conectado a la nube';
             } else {
                 connectionStatus.className = 'connection-status offline';
-                connectionStatusText.textContent = '⚠️ Sin conexión a la nube';
+                connectionStatusText.innerHTML = '<i class="bi bi-cloud-slash" aria-hidden="true"></i> Sin conexión a la nube';
             }
         }
 
@@ -2408,14 +2916,14 @@
                     }
                 }, (error) => {
                     console.error("Error cargando datos de Firebase:", error);
-                    syncStatusText.textContent = '⚠️ Error de conexión con la base de datos';
+                    syncStatusText.textContent = 'Error de conexión con la base de datos';
                     syncStatus.className = 'message error';
                     updateConnectionStatus(false);
                 });
                 
             } catch (error) {
                 console.error("Error en loadAnnouncementsFromFirebase:", error);
-                syncStatusText.textContent = '⚠️ Error crítico de conexión';
+                syncStatusText.textContent = 'Error crítico de conexión';
                 syncStatus.className = 'message error';
                 updateConnectionStatus(false);
             }
@@ -2499,178 +3007,76 @@
 
         // Mostrar alerta personalizada
         function showCustomAlert(type, title, message, icon = null) {
-            // Crear overlay
             const overlay = document.createElement('div');
             overlay.className = 'custom-alert';
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.3);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-            `;
-            
-            // Iconos según el tipo
+
             const icons = {
-                success: icon || '✅',
-                error: icon || '❌',
-                warning: icon || '⚠️',
-                info: icon || 'ℹ️'
+                success: icon || 'bi-check-circle',
+                error: icon || 'bi-x-octagon',
+                warning: icon || 'bi-exclamation-triangle',
+                info: icon || 'bi-info-circle'
             };
-            
-            // Colores según el tipo
-            const colors = {
-                success: 'var(--verde)',
-                error: 'var(--rojo)',
-                warning: 'var(--naranja)',
-                info: 'var(--azul-secundario)'
-            };
-            
-            // Crear contenido
+
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert-content ${type}`;
-            alertDiv.style.cssText = `
-                background: white;
-                padding: 2rem;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                max-width: 400px;
-                width: 90%;
-                text-align: center;
-                border-top: 5px solid ${colors[type]};
-                animation: fadeIn 0.3s ease;
-            `;
-            
             alertDiv.innerHTML = `
-                <div class="alert-icon" style="font-size: 3rem; margin-bottom: 1rem;">
-                    ${icons[type]}
-                </div>
-                <h3 style="color: var(--azul-principal); margin-bottom: 1rem;">${title}</h3>
-                <p style="margin-bottom: 2rem; color: var(--gris-oscuro); line-height: 1.5;">${message}</p>
-                <button class="alert-btn" style="
-                    padding: 0.8rem 2rem;
-                    background: ${colors[type]};
-                    color: white;
-                    border: none;
-                    border-radius: 6px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.3s;
-                ">Aceptar</button>
+                <div class="alert-icon"><i class="bi ${icons[type] || icons.info}" aria-hidden="true"></i></div>
+                <h3>${title}</h3>
+                <p>${message}</p>
+                <button class="alert-btn" type="button"><i class="bi bi-check-lg" aria-hidden="true"></i> Aceptar</button>
             `;
-            
+
             overlay.appendChild(alertDiv);
             document.body.appendChild(overlay);
-            
-            // Configurar botón
-            const alertBtn = alertDiv.querySelector('.alert-btn');
-            alertBtn.addEventListener('click', () => {
-                document.body.removeChild(overlay);
+
+            const closeAlert = () => {
+                if (document.body.contains(overlay)) overlay.remove();
+            };
+
+            alertDiv.querySelector('.alert-btn').addEventListener('click', closeAlert);
+            overlay.addEventListener('click', (event) => {
+                if (event.target === overlay) closeAlert();
             });
-            
-            // Auto cerrar después de 3 segundos
-            setTimeout(() => {
-                if (document.body.contains(overlay)) {
-                    document.body.removeChild(overlay);
-                }
-            }, 3000);
-            
+            setTimeout(closeAlert, 3500);
             return overlay;
         }
 
         // Mostrar diálogo de confirmación
         function showConfirmationDialog(title, message, type = 'warning') {
             return new Promise((resolve) => {
-                // Crear overlay
                 const overlay = document.createElement('div');
                 overlay.className = 'custom-alert';
-                
-                // Iconos
+
                 const icons = {
-                    warning: '⚠️',
-                    danger: '❗',
-                    info: 'ℹ️'
+                    warning: 'bi-exclamation-triangle',
+                    danger: 'bi-trash',
+                    info: 'bi-info-circle'
                 };
-                
-                // Colores
-                const colors = {
-                    warning: 'var(--naranja)',
-                    danger: 'var(--rojo)',
-                    info: 'var(--azul-secundario)'
-                };
-                
-                // Crear contenido
+
                 const dialog = document.createElement('div');
                 dialog.className = `alert-content ${type}`;
-                dialog.style.cssText = `
-                    background: white;
-                    padding: 2rem;
-                    border-radius: 12px;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                    max-width: 400px;
-                    width: 90%;
-                    text-align: center;
-                    border-top: 5px solid ${colors[type]};
-                    animation: fadeIn 0.3s ease;
-                `;
-                
                 dialog.innerHTML = `
-                    <div class="alert-icon" style="font-size: 3rem; margin-bottom: 1rem;">
-                        ${icons[type] || icons.warning}
-                    </div>
-                    <h3 style="color: var(--azul-principal); margin-bottom: 1rem;">${title}</h3>
-                    <p style="color: var(--gris-oscuro); margin-bottom: 2rem; line-height: 1.5;">${message}</p>
-                    <div style="display: flex; gap: 1rem;">
-                        <button id="cancelBtn" style="
-                            flex: 1;
-                            padding: 0.8rem;
-                            background: var(--gris-claro);
-                            color: var(--gris-oscuro);
-                            border: none;
-                            border-radius: 6px;
-                            font-weight: 600;
-                            cursor: pointer;
-                            transition: all 0.3s;
-                        ">Cancelar</button>
-                        <button id="confirmBtn" style="
-                            flex: 1;
-                            padding: 0.8rem;
-                            background: ${colors[type]};
-                            color: white;
-                            border: none;
-                            border-radius: 6px;
-                            font-weight: 600;
-                            cursor: pointer;
-                            transition: all 0.3s;
-                        ">Eliminar</button>
+                    <div class="alert-icon"><i class="bi ${icons[type] || icons.warning}" aria-hidden="true"></i></div>
+                    <h3>${title}</h3>
+                    <p>${message}</p>
+                    <div class="dialog-actions">
+                        <button class="dialog-cancel" type="button"><i class="bi bi-x-lg" aria-hidden="true"></i> Cancelar</button>
+                        <button class="dialog-confirm" type="button"><i class="bi bi-trash" aria-hidden="true"></i> Eliminar</button>
                     </div>
                 `;
-                
+
                 overlay.appendChild(dialog);
                 document.body.appendChild(overlay);
-                
-                // Configurar botones
-                document.getElementById('cancelBtn').addEventListener('click', () => {
-                    document.body.removeChild(overlay);
-                    resolve(false);
-                });
-                
-                document.getElementById('confirmBtn').addEventListener('click', () => {
-                    document.body.removeChild(overlay);
-                    resolve(true);
-                });
-                
-                // Cerrar al hacer clic fuera
-                overlay.addEventListener('click', (e) => {
-                    if (e.target === overlay) {
-                        document.body.removeChild(overlay);
-                        resolve(false);
-                    }
+
+                const finish = (result) => {
+                    if (document.body.contains(overlay)) overlay.remove();
+                    resolve(result);
+                };
+
+                dialog.querySelector('.dialog-cancel').addEventListener('click', () => finish(false));
+                dialog.querySelector('.dialog-confirm').addEventListener('click', () => finish(true));
+                overlay.addEventListener('click', (event) => {
+                    if (event.target === overlay) finish(false);
                 });
             });
         }
@@ -2974,7 +3380,7 @@
                     'success',
                     '¡Anuncios Eliminados!',
                     `${idsToDelete.length} anuncio(s) se han eliminado exitosamente. La página se recargará automáticamente.`,
-                    '🗑️'
+                    'bi-trash'
                 );
                 
                 // Forzar recarga completa de la página después de 2 segundos
@@ -3046,7 +3452,7 @@
                 // Simular recarga forzando una nueva lectura
                 loadAnnouncementsFromFirebase();
                 setTimeout(() => {
-                    showCustomAlert('success', '¡Datos Actualizados!', 'Los anuncios se han actualizado correctamente.', '🔄');
+                    showCustomAlert('success', '¡Datos Actualizados!', 'Los anuncios se han actualizado correctamente.', 'bi-arrow-clockwise');
                 }, 300);
             });
             
@@ -3170,7 +3576,7 @@
                 isAdminLoggedIn = true;
                 localStorage.setItem('adminSession', 'active');
                 updateLoginUI();
-                showCustomAlert('success', '¡Sesión Iniciada!', 'Sesión de administrador iniciada correctamente.', '🔐');
+                showCustomAlert('success', '¡Sesión Iniciada!', 'Sesión de administrador iniciada correctamente.', 'bi-shield-lock');
                 loginForm.classList.remove('active');
                 usernameInput.value = '';
                 passwordInput.value = '';
@@ -3184,7 +3590,7 @@
             isAdminLoggedIn = false;
             localStorage.removeItem('adminSession');
             updateLoginUI();
-            showCustomAlert('success', '¡Sesión Cerrada!', 'Sesión de administrador cerrada correctamente.', '🚪');
+            showCustomAlert('success', '¡Sesión Cerrada!', 'Sesión de administrador cerrada correctamente.', 'bi-box-arrow-right');
             
             // Volver a vista de departamentos
             showView('departmentSelection');
@@ -3295,7 +3701,7 @@
             const author = document.getElementById('author').value.trim();
             
             // Validar campos
-            if (!title || !description || !date || !author) {
+            if (!title || !description || !date || !time || !author) {
                 showMessage('Por favor completa todos los campos obligatorios.', 'error');
                 isProcessing = false;
                 return;
@@ -3362,7 +3768,7 @@
                             'success',
                             '¡Anuncio Publicado!',
                             'Tu anuncio se ha publicado exitosamente. La página se recargará automáticamente.',
-                            '📢'
+                            'bi-megaphone'
                         );
                         
                         // Mostrar overlay de carga y recargar después de 2 segundos
@@ -3400,7 +3806,7 @@
                         'success',
                         '¡Anuncio Publicado!',
                         'Tu anuncio se ha publicado exitosamente. La página se recargará automáticamente.',
-                        '📢'
+                        'bi-megaphone'
                     );
                     
                     // Mostrar overlay de carga y recargar después de 2 segundos
@@ -3460,7 +3866,7 @@
             const author = document.getElementById('editAuthorDisplay').value.trim();
             
             // Validar campos
-            if (!title || !description || !date || !author) {
+            if (!title || !description || !date || !time || !author) {
                 showMessage('Por favor completa todos los campos obligatorios.', 'error');
                 isProcessing = false;
                 return;
@@ -3506,7 +3912,7 @@
                         'success',
                         '¡Anuncio Actualizado!',
                         'El anuncio se ha actualizado exitosamente. La página se recargará automáticamente.',
-                        '✏️'
+                        'bi-pencil-square'
                     );
                     
                     // Mostrar overlay de carga y recargar después de 2 segundos
@@ -3598,7 +4004,7 @@
                                         </div>
                                     </div>
                                     <div class="file-preview">
-                                        ${generateFilePreview(file)}
+                                        ${generateFilePreview(file, announcement.id, index)}
                                     </div>
                                 </div>
                             `).join('')}
@@ -3662,7 +4068,7 @@
         }
 
         // Generar vista previa de archivo
-        function generateFilePreview(file) {
+        function generateFilePreview(file, announcementId, fileIndex) {
             if (file.type.startsWith('image/')) {
                 const base64Data = `data:${file.type};base64,${file.data}`;
                 return `<img src="${base64Data}" class="image-preview" alt="${file.name}">`;
@@ -3684,8 +4090,8 @@
                             ${getFileTypeName(file.type)} • ${formatFileSize(file.size)}
                         </p>
                         <div class="preview-actions">
-                            <button class="preview-download-btn" onclick="downloadFileFromDetails(${announcement.id}, ${index})">
-                                ⬇️ Descargar Archivo
+                            <button class="preview-download-btn" onclick="downloadFileFromDetails(${announcementId}, ${fileIndex})">
+                                <i class="bi bi-download" aria-hidden="true"></i> Descargar archivo
                             </button>
                         </div>
                     </div>
@@ -3759,7 +4165,7 @@
                     'success',
                     '¡Anuncio Eliminado!',
                     'El anuncio se ha eliminado correctamente. La página se recargará automáticamente.',
-                    '🗑️'
+                    'bi-trash'
                 );
                 
                 // Forzar recarga completa después de 2 segundos
@@ -3896,14 +4302,14 @@
                         ${checkbox}
                         <div class="announcement-actions">
                             ${!isSelectionMode ? `
-                                <button class="action-btn details-btn" onclick="openDetailsModal(${announcement.id})">
-                                    👁️
+                                <button class="action-btn details-btn" onclick="openDetailsModal(${announcement.id})" aria-label="Ver detalles" title="Ver detalles">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
                                 </button>
-                                <button class="action-btn edit-btn" onclick="openEditPanel(${announcement.id})">
-                                    ✏️
+                                <button class="action-btn edit-btn" onclick="openEditPanel(${announcement.id})" aria-label="Editar" title="Editar">
+                                    <i class="bi bi-pencil-square" aria-hidden="true"></i>
                                 </button>
-                                <button class="action-btn delete-btn" onclick="deleteAnnouncement(${announcement.id})">
-                                    🗑️
+                                <button class="action-btn delete-btn" onclick="deleteAnnouncement(${announcement.id})" aria-label="Eliminar" title="Eliminar">
+                                    <i class="bi bi-trash" aria-hidden="true"></i>
                                 </button>
                             ` : ''}
                         </div>
@@ -3922,7 +4328,7 @@
                             <strong>Publicado por:</strong> ${announcement.author}
                             ${fileCount > 0 ? `
                                 <span style="font-size: 0.7rem; color: var(--morado); display: block; margin-top: 0.2rem;">
-                                    📎 ${fileCount} archivo(s) adjunto(s)
+                                    <i class="bi bi-paperclip" aria-hidden="true"></i> ${fileCount} archivo(s) adjunto(s)
                                 </span>
                             ` : ''}
                             <span style="font-size: 0.7rem; color: #666; display: block; margin-top: 0.2rem;">
@@ -4035,6 +4441,54 @@
         window.openEditPanel = openEditPanel;
         window.deleteAnnouncement = deleteAnnouncement;
         window.toggleAnnouncementSelection = toggleAnnouncementSelection;
+
+
+        // Instalación PWA (Chrome/Edge/Android)
+        let deferredInstallPrompt = null;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (event) => {
+            event.preventDefault();
+            deferredInstallPrompt = event;
+            installBtn.hidden = false;
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredInstallPrompt) {
+                showCustomAlert(
+                    'info',
+                    'Instalar aplicación',
+                    'Abre el menú de tu navegador y selecciona “Instalar aplicación” o “Agregar a pantalla principal”.',
+                    'bi-phone'
+                );
+                return;
+            }
+
+            deferredInstallPrompt.prompt();
+            await deferredInstallPrompt.userChoice;
+            deferredInstallPrompt = null;
+            installBtn.hidden = true;
+        });
+
+        window.addEventListener('appinstalled', () => {
+            deferredInstallPrompt = null;
+            installBtn.hidden = true;
+            showCustomAlert('success', 'Aplicación instalada', 'El Gestor de Anuncios ya está disponible en tu dispositivo.', 'bi-phone');
+        });
+
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            installBtn.hidden = true;
+        }
+
+        // Registrar el Service Worker sin modificar la conexión de Firebase
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js').catch((error) => {
+                    console.error('No se pudo registrar el Service Worker:', error);
+                });
+            });
+        }
+
     </script>
 </body>
 </html>
