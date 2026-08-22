@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gestor-anuncios-v2';
+const CACHE_NAME = 'gestor-anuncios-v3-mobile-install';
 const APP_SHELL = [
   './',
   './index.html',

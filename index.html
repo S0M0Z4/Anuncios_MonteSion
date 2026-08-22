@@ -2225,9 +2225,9 @@
     <nav class="mobile-nav" aria-label="Navegación móvil">
         <button class="mobile-nav-button active" type="button" data-app-nav="home"><i class="bi bi-house-door"></i><span>Inicio</span></button>
         <button class="mobile-nav-button" type="button" data-app-nav="my-announcements"><i class="bi bi-megaphone"></i><span>Anuncios</span></button>
-        <button class="mobile-nav-button primary" type="button" data-app-nav="new" aria-label="Crear anuncio"><i class="bi bi-plus-lg"></i><span>Nuevo</span></button>
-        <button class="mobile-nav-button" type="button" data-app-nav="departments"><i class="bi bi-folder"></i><span>Áreas</span></button>
-        <button class="mobile-nav-button" type="button" data-app-nav="admin"><i class="bi bi-shield-check"></i><span>Admin</span></button>
+        <button class="mobile-nav-button primary" type="button" data-app-nav="new" aria-label="Nuevo anuncio"><i class="bi bi-plus-lg"></i><span>Nuevo</span></button>
+        <button class="mobile-nav-button" type="button" data-app-nav="departments"><i class="bi bi-folder"></i><span>Departamentos</span></button>
+        <button id="mobileInstallBtn" class="mobile-nav-button" type="button" data-app-nav="install" aria-label="Instalar aplicación"><i class="bi bi-download"></i><span>Instalar</span></button>
     </nav>
 
     <footer class="app-footer">
@@ -3197,8 +3197,12 @@
                 currentDepartment = null;
                 showView("announcements");
             } else if (action === "new") {
-                currentDepartment = currentDepartment || localStorage.getItem("lastAnnouncementDepartment");
-                showView("form");
+                // Nuevo anuncio siempre comienza pidiendo el departamento.
+                // No reutilizamos el último departamento para evitar publicar accidentalmente en otra área.
+                currentDepartment = null;
+                showView("home");
+                showCustomAlert("info", "Elige tu departamento", "Primero selecciona el departamento o ministerio al que pertenece el anuncio.");
+                window.setTimeout(() => departmentSelection.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
             } else if (action === "admin") {
                 if (isAdminLoggedIn) {
                     showView("admin");
@@ -3725,6 +3729,7 @@
             await deferredInstallPrompt.userChoice;
             deferredInstallPrompt = null;
             installBtn.hidden = true;
+            if (document.getElementById("mobileInstallBtn")) document.getElementById("mobileInstallBtn").hidden = true;
         }
 
         async function initApp() {
@@ -3764,7 +3769,10 @@
         window.addEventListener("beforeinstallprompt", (event) => {
             event.preventDefault();
             deferredInstallPrompt = event;
-            installBtn.hidden = false;
+            if (!isAppStandalone()) {
+                installBtn.hidden = false;
+                if (document.getElementById("mobileInstallBtn")) document.getElementById("mobileInstallBtn").hidden = false;
+            }
         });
 
         installBtn.addEventListener("click", installApplication);
@@ -3772,12 +3780,29 @@
         window.addEventListener("appinstalled", () => {
             deferredInstallPrompt = null;
             installBtn.hidden = true;
+            if (document.getElementById("mobileInstallBtn")) document.getElementById("mobileInstallBtn").hidden = true;
             showCustomAlert("success", "Aplicación instalada", "El Gestor de Anuncios ya está disponible en tu dispositivo.", "bi-phone");
         });
 
-        if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true) {
-            installBtn.hidden = true;
+        function isAppStandalone() {
+            return window.matchMedia("(display-mode: standalone)").matches ||
+                   window.matchMedia("(display-mode: fullscreen)").matches ||
+                   window.matchMedia("(display-mode: minimal-ui)").matches ||
+                   window.navigator.standalone === true;
         }
+
+        function syncInstallButtons() {
+            const installed = isAppStandalone();
+            if (installed) {
+                installBtn.hidden = true;
+                if (document.getElementById("mobileInstallBtn")) document.getElementById("mobileInstallBtn").hidden = true;
+            } else {
+                if (document.getElementById("mobileInstallBtn")) document.getElementById("mobileInstallBtn").hidden = false;
+            }
+        }
+
+        syncInstallButtons();
+        window.matchMedia("(display-mode: standalone)").addEventListener?.("change", syncInstallButtons);
 
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
