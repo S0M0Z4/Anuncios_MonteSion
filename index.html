@@ -561,8 +561,8 @@
             display: grid;
             place-items: center;
             color: var(--azul-brillante);
-            background: #eaf2ff;
-            border-radius: 14px;
+            background: transparent;
+            border-radius: 0;
             font-size: 1.25rem;
         }
 
@@ -632,8 +632,8 @@
             display: grid;
             place-items: center;
             color: var(--azul-brillante);
-            background: #eaf2ff;
-            border-radius: 12px;
+            background: transparent;
+            border-radius: 0;
         }
 
         .mini-item strong {
@@ -803,8 +803,8 @@
             display: grid;
             place-items: center;
             color: var(--azul-brillante);
-            background: #eaf2ff;
-            border-radius: 14px;
+            background: transparent;
+            border-radius: 0;
             font-size: 1.22rem;
         }
 
@@ -1786,7 +1786,17 @@
             .action-btn { width: 100%; }
             .alert-actions { grid-template-columns: 1fr; }
         }
-    </style>
+    
+        /* Iconos limpios: sin fondos ni cuadros decorativos. */
+        .stat-icon, .mini-icon, .department-icon, .option-icon {
+            background: transparent !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+        .brand-logo { background: transparent !important; box-shadow: none !important; padding: 0 !important; }
+        .sidebar-link i, .header-button i, .mobile-nav-button i, .hero-button i, .link-button i,
+        .file-icon, .file-upload-icon, .input-with-icon > i { background: transparent !important; }
+</style>
 
     <!-- Firebase SDK: misma configuración y la misma Realtime Database del proyecto original. -->
     <script type="module">
