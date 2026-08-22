@@ -1,9 +1,8 @@
-const CACHE_NAME = 'gestor-anuncios-v3-mobile-install';
+const CACHE_NAME = 'gestor-anuncios-v4-layout';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './assets/bootstrap-icons.min.css',
   './icon/logo.png',
   './icon/icon-192.png',
   './icon/icon-512.png',
