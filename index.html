@@ -1700,6 +1700,12 @@
             .pdf-preview { min-height: 280px; }
             .app-footer { display: none; }
             .connection-status { right: 10px; bottom: 82px; }
+            /* En móvil el acceso administrativo vive en la barra inferior.
+               El formulario de acceso se conserva para que el escudo inferior pueda abrirlo. */
+            .header-actions .login-container { display: flex; }
+            .header-actions .login-container > #loginBtn,
+            .header-actions .login-container > #adminViewBtn,
+            .header-actions .login-container > #logoutBtn { display: none !important; }
             .mobile-nav {
                 position: fixed;
                 left: 0;
@@ -1741,12 +1747,6 @@
                 background: linear-gradient(145deg, #0d6efd, #0752d1);
                 border-radius: 50%;
                 box-shadow: 0 9px 24px rgba(13, 110, 253, 0.35);
-            }
-            .mobile-nav.install-hidden {
-                grid-template-columns: repeat(4, minmax(0, 1fr));
-            }
-            .mobile-nav.install-hidden .mobile-nav-button.primary {
-                margin-top: 0;
             }
             .mobile-nav-button.primary span { display: none; }
             .mobile-nav-button.primary i { font-size: 1.35rem; }
@@ -2245,7 +2245,9 @@
         <button class="mobile-nav-button" type="button" data-app-nav="my-announcements"><i class="bi bi-megaphone"></i><span>Anuncios</span></button>
         <button class="mobile-nav-button primary" type="button" data-app-nav="new" aria-label="Nuevo anuncio"><i class="bi bi-plus-lg"></i><span>Nuevo</span></button>
         <button class="mobile-nav-button" type="button" data-app-nav="departments"><i class="bi bi-folder"></i><span>Departamentos</span></button>
-        <button id="mobileInstallBtn" class="mobile-nav-button" type="button" data-app-nav="install" aria-label="Instalar aplicación"><i class="bi bi-download"></i><span>Instalar</span></button>
+        <button id="mobileUtilityBtn" class="mobile-nav-button" type="button" data-app-nav="install" aria-label="Instalar aplicación">
+            <i id="mobileUtilityIcon" class="bi bi-download"></i><span id="mobileUtilityLabel">Instalar</span>
+        </button>
     </nav>
 
     <footer class="app-footer">
@@ -2353,6 +2355,7 @@
         let isAdminLoggedIn = false;
         let currentUser = null;
         let currentDepartment = null;
+        let departmentSelectionPurpose = "browse";
         let deviceId = null;
         let isProcessing = false;
         let selectedFiles = [];
@@ -3200,6 +3203,15 @@
         function selectDepartment(department) {
             currentDepartment = department;
             localStorage.setItem("lastAnnouncementDepartment", department);
+
+            if (departmentSelectionPurpose === "create") {
+                // El departamento ya fue elegido: no volver a pedirlo.
+                departmentSelectionPurpose = "browse";
+                showView("form");
+                return;
+            }
+
+            departmentSelectionPurpose = "browse";
             showView("announcements");
         }
 
@@ -3209,15 +3221,16 @@
                 showView("home");
             } else if (action === "departments") {
                 currentDepartment = null;
+                departmentSelectionPurpose = "browse";
                 showView("home");
                 window.setTimeout(() => departmentSelection.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
             } else if (action === "my-announcements") {
                 currentDepartment = null;
                 showView("announcements");
             } else if (action === "new") {
-                // Nuevo anuncio siempre comienza pidiendo el departamento.
-                // No reutilizamos el último departamento para evitar publicar accidentalmente en otra área.
+                // Crear siempre comienza en la selección. Después de elegir, se abre directamente el formulario.
                 currentDepartment = null;
+                departmentSelectionPurpose = "create";
                 showView("home");
                 showCustomAlert("info", "Elige tu departamento", "Primero selecciona el departamento o ministerio al que pertenece el anuncio.");
                 window.setTimeout(() => departmentSelection.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
@@ -3687,13 +3700,18 @@
             });
             logoutBtn.addEventListener("click", handleLogout);
             adminViewBtn.addEventListener("click", () => showView("admin"));
+            $("mobileUtilityBtn").addEventListener("click", () => handleNavigation($("mobileUtilityBtn").dataset.appNav));
 
             $("backToDepartmentsBtn").addEventListener("click", () => showView("home"));
             $("backToJuvenilBtn").addEventListener("click", () => showView("juvenil"));
             $("backToSelectionBtn").addEventListener("click", () => showView("announcements"));
             $("backToAnnouncementsBtn").addEventListener("click", () => showView("home"));
             $("backToMainFromAdminBtn").addEventListener("click", () => showView("home"));
-            $("createAnnouncementBtn").addEventListener("click", () => handleNavigation("new"));
+            $("createAnnouncementBtn").addEventListener("click", () => {
+                // Desde "Mis anuncios", el departamento actual ya está seleccionado.
+                departmentSelectionPurpose = "browse";
+                showView("form");
+            });
             $("refreshCloudBtn").addEventListener("click", async () => {
                 showLoadingOverlay("Actualizando...", "Consultando los datos más recientes.");
                 await loadAnnouncementsFromFirebase();
@@ -3733,20 +3751,33 @@
             });
         }
 
-        function syncMobileInstallLayout() {
-            const nav = document.querySelector(".mobile-nav");
-            const install = document.getElementById("mobileInstallBtn");
-            if (!nav || !install) return;
-            nav.classList.toggle("install-hidden", install.hidden);
+        function updateMobileUtilityButton() {
+            const button = $("mobileUtilityBtn");
+            const icon = $("mobileUtilityIcon");
+            const label = $("mobileUtilityLabel");
+            if (!button || !icon || !label) return;
+
+            const installed = isAppStandalone() || localStorage.getItem("pwaInstalled") === "true";
+            if (installed) {
+                button.dataset.appNav = "admin";
+                button.setAttribute("aria-label", "Panel administrativo");
+                button.title = "Panel administrativo";
+                icon.className = "bi bi-shield-check";
+                label.textContent = "Admin";
+            } else {
+                button.dataset.appNav = "install";
+                button.setAttribute("aria-label", "Instalar aplicación");
+                button.title = "Instalar aplicación";
+                icon.className = "bi bi-download";
+                label.textContent = "Instalar";
+            }
         }
 
         function setInstallVisibility(visible) {
             const installed = isAppStandalone() || localStorage.getItem("pwaInstalled") === "true";
             const shouldShow = visible && !installed;
             installBtn.hidden = !shouldShow;
-            const mobile = document.getElementById("mobileInstallBtn");
-            if (mobile) mobile.hidden = !shouldShow;
-            syncMobileInstallLayout();
+            updateMobileUtilityButton();
         }
 
         async function installApplication() {
@@ -3786,7 +3817,9 @@
                 $(id).min = today;
             });
 
+            departmentSelectionPurpose = "browse";
             showView("home");
+            updateMobileUtilityButton();
             await loadAnnouncementsFromFirebase();
         }
 
@@ -3804,7 +3837,7 @@
             deferredInstallPrompt = event;
             if (!isAppStandalone()) {
                 installBtn.hidden = false;
-                if (document.getElementById("mobileInstallBtn")) document.getElementById("mobileInstallBtn").hidden = false;
+                updateMobileUtilityButton();
             }
         });
 
